@@ -1,0 +1,19 @@
+
+.tree-table-view {
+    -fx-tree-table-color: #377ce8;
+}
+
+.tree-table-column {
+    -fx-column-halignment: center;
+    -fx-halignment: center;
+    -fx-text-alignment: center;
+}
+
+.tree-table-view:focused .tree-table-row-cell:selected {
+    -fx-background-color: -fx-tree-table-color;
+    -fx-table-cell-border-color: -fx-tree-table-color;
+}
+
+.tree-table-row-cell:hover {
+    -fx-background-color: #9F9F9F;
+}
