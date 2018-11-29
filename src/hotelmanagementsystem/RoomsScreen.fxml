@@ -10,7 +10,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-
 <StackPane fx:id="stackepane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="730.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hotelmanagementsystem.RoomsScreenController">
    <children>
       <AnchorPane id="AnchorPane" prefHeight="730.0" prefWidth="1366.0" style="-fx-background-image:url(img/moje/home-screen-bed.jpeg)">
@@ -56,14 +55,19 @@
                         </JFXButton>
                      </children>
                   </Pane>
-                  <Pane layoutX="20.0" layoutY="495.0" prefHeight="127.0" prefWidth="379.0" style="-fx-border-radius: 15; -fx-border-color: #ccc; -fx-border-width: 2 px;">
+                  <Pane layoutX="20.0" layoutY="501.0" prefHeight="127.0" prefWidth="379.0" style="-fx-border-radius: 15; -fx-border-color: #ccc; -fx-border-width: 2 px;">
                      <children>
-                        <JFXButton buttonType="RAISED" layoutX="78.0" layoutY="49.0" onMouseClicked="#goBack" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
+                        <JFXButton buttonType="RAISED" layoutX="146.0" layoutY="49.0" onMouseClicked="#goBack" prefHeight="30.0" prefWidth="88.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </JFXButton>
-                        <JFXButton buttonType="RAISED" layoutX="221.0" layoutY="49.0" onMouseClicked="#close" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
+                        <JFXButton buttonType="RAISED" layoutX="254.0" layoutY="49.0" onMouseClicked="#close" prefHeight="30.0" prefWidth="88.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton buttonType="RAISED" layoutX="37.0" layoutY="49.0" onMouseClicked="#addRoom" prefHeight="30.0" prefWidth="88.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Add room" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -80,7 +84,7 @@
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label layoutX="95.0" layoutY="468.0" text="You can go back or close the application">
+                  <Label layoutX="120.0" layoutY="460.0" text="You can also add a new room, &#10;go back or close the application" textAlignment="CENTER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>

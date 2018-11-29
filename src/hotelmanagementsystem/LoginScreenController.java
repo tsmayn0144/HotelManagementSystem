@@ -41,7 +41,9 @@ import javafx.stage.StageStyle;
  * @author Adrian Szmurło
  */
 public class LoginScreenController implements Initializable {
-
+    
+    public static String userRole = "";
+    
     @FXML
     private JFXTextField username;
     @FXML
@@ -90,7 +92,7 @@ public class LoginScreenController implements Initializable {
                 while (rs.next()) {
                     isExist = true;
                     userPass = rs.getString(3);
-                    userType = rs.getString(9);
+                    userType = rs.getString(8);
                 }
 
                 if (isExist) {
@@ -99,6 +101,8 @@ public class LoginScreenController implements Initializable {
                             Stage adminScreen = new Stage();
                             Parent root = null;
 
+                            userRole = "admin";
+                            
                             try {
                                 root = FXMLLoader.load(getClass().getResource("AdminScreen.fxml"));
                             } 

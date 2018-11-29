@@ -84,7 +84,7 @@ public class RoomsScreenController implements Initializable {
     public void loadAllRooms(String sql) {
         
         JFXTreeTableColumn<Room, String> room_id = new JFXTreeTableColumn<>("Room id");
-        room_id.setPrefWidth(100);
+        room_id.setPrefWidth(90);
         room_id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -93,7 +93,7 @@ public class RoomsScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Room, String> room_type = new JFXTreeTableColumn<>("Room type");
-        room_type.setPrefWidth(110);
+        room_type.setPrefWidth(100);
         room_type.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -102,7 +102,7 @@ public class RoomsScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Room, String> room_number = new JFXTreeTableColumn<>("Room number");
-        room_number.setPrefWidth(110);
+        room_number.setPrefWidth(100);
         room_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -111,7 +111,7 @@ public class RoomsScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Room, String> num_of_people = new JFXTreeTableColumn<>("Number of people");
-        num_of_people.setPrefWidth(130);
+        num_of_people.setPrefWidth(120);
         num_of_people.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -119,17 +119,26 @@ public class RoomsScreenController implements Initializable {
             }
         });
         
-        JFXTreeTableColumn<Room, String> floor_number = new JFXTreeTableColumn<>("Floor number");
-        floor_number.setPrefWidth(120);
-        floor_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+        JFXTreeTableColumn<Room, String> ac = new JFXTreeTableColumn<>("A/C");
+        ac.setPrefWidth(90);
+        ac.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().floorNumber;
+                return param.getValue().getValue().ac;
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> balcony = new JFXTreeTableColumn<>("Balcony");
+        balcony.setPrefWidth(90);
+        balcony.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().balcony;
             }
         });
         
         JFXTreeTableColumn<Room, String> room_phone = new JFXTreeTableColumn<>("Room phone");
-        room_phone.setPrefWidth(110);
+        room_phone.setPrefWidth(100);
         room_phone.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -138,7 +147,7 @@ public class RoomsScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Room, String> room_price = new JFXTreeTableColumn<>("Room price");
-        room_price.setPrefWidth(110);
+        room_price.setPrefWidth(100);
         room_price.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -147,7 +156,7 @@ public class RoomsScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Room, String> room_status = new JFXTreeTableColumn<>("Room status");
-        room_status.setPrefWidth(110);
+        room_status.setPrefWidth(100);
         room_status.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
@@ -162,7 +171,7 @@ public class RoomsScreenController implements Initializable {
             ResultSet rs = ps.executeQuery();
             
             while(rs.next()) {
-                rooms.add(new Room(rs.getInt(1)+"", rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8)));
+                rooms.add(new Room(rs.getInt(1)+"", rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)));
             }
         } 
         catch (SQLException ex) {
@@ -170,7 +179,7 @@ public class RoomsScreenController implements Initializable {
         }
         
         final TreeItem<Room> root = new RecursiveTreeItem<Room>(rooms, RecursiveTreeObject::getChildren);
-        treeView.getColumns().setAll(room_id, room_type, room_number, num_of_people, floor_number, room_phone, room_price, room_status);
+        treeView.getColumns().setAll(room_id, room_type, room_number, num_of_people, ac, balcony, room_phone, room_price, room_status);
         treeView.setRoot(root);
         treeView.setShowRoot(false);
     }
@@ -202,11 +211,6 @@ public class RoomsScreenController implements Initializable {
         }
         
         if(res > 0) {
-            /*Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Data update");
-            alert.setHeaderText("Information dialog");
-            alert.setContentText("Record updated successfully!");
-            alert.showAndWait();*/
             Image image = new Image("img/mooo.png");
             Notifications notification = Notifications.create().title("Done").text("Room updated successfully")
                     .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
@@ -216,11 +220,6 @@ public class RoomsScreenController implements Initializable {
             search_text.setText("");
         }
         else {
-            /*Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Data update");
-            alert.setHeaderText("Information dialog");
-            alert.setContentText("Error updating record!");
-            alert.showAndWait();*/
             Image image = new Image("img/delete.png");
             Notifications notification = Notifications.create().title("Error").text("Something went wrong")
                     .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
@@ -254,7 +253,10 @@ public class RoomsScreenController implements Initializable {
         Parent root = null;
         
         try {
-            root = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
+            if (LoginScreenController.userRole.equals("admin"))
+                root = FXMLLoader.load(getClass().getResource("HomeScreenAdmin.fxml"));
+            else
+                root = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
         } 
         catch (IOException ex) {
             Logger.getLogger(AdminScreenController.class.getName()).log(Level.SEVERE, null, ex);
@@ -308,5 +310,27 @@ public class RoomsScreenController implements Initializable {
                 }
             }
         });
+    }
+
+    @FXML
+    private void addRoom(MouseEvent event) {
+        Stage addingRoom = new Stage();
+        Parent root = null;
+        
+        try {
+            root = FXMLLoader.load(getClass().getResource("NewRoomScreen.fxml"));
+        } 
+        catch (IOException ex) {
+            Logger.getLogger(RoomsScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        Stage current = (Stage)stackepane.getScene().getWindow();
+        Scene scene = new Scene(root);
+        
+        addingRoom.setScene(scene);
+        addingRoom.initStyle(StageStyle.TRANSPARENT);
+        
+        current.hide();
+        addingRoom.show();
     }
 }

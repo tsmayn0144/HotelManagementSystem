@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-
 <StackPane fx:id="stackepane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="730.0" prefWidth="1366.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hotelmanagementsystem.HomeScreenAdminController">
    <children>
       <AnchorPane id="AnchorPane" prefHeight="730.0" prefWidth="1366.0" style="-fx-background-image:url(img/moje/home-screen-bed.jpeg)">
@@ -34,7 +33,7 @@
                         <Image url="@../img/001-interface-1.png" />
                      </image>
                   </ImageView>
-                  <Label layoutX="45.0" layoutY="143.0" text="Available Rooms" textFill="BLACK">
+                  <Label layoutX="32.0" layoutY="143.0" text="Rooms Management" textFill="BLACK">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>

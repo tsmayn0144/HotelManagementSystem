@@ -76,8 +76,6 @@ public class EmployeesScreenController implements Initializable {
     @FXML
     private JFXTextField phone;
     @FXML
-    private JFXTextField salary;
-    @FXML
     private JFXComboBox<String> userType;
     @FXML
     private JFXDatePicker startDate;
@@ -98,13 +96,15 @@ public class EmployeesScreenController implements Initializable {
         userTypeList.add("normal");
         userType.setItems(userTypeList);
         
+        userType.setValue("");
+        
         loadAllEmployees("SELECT * FROM users");
     }    
     
     public void loadAllEmployees(String sql) {
         
         JFXTreeTableColumn<Employee, String> id = new JFXTreeTableColumn<>("Id");
-        id.setPrefWidth(60);
+        id.setPrefWidth(70);
         id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -113,7 +113,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> user_name = new JFXTreeTableColumn<>("Username");
-        user_name.setPrefWidth(110);
+        user_name.setPrefWidth(120);
         user_name.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -122,7 +122,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> pass = new JFXTreeTableColumn<>("Password");
-        pass.setPrefWidth(105);
+        pass.setPrefWidth(115);
         pass.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -131,7 +131,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> full_name = new JFXTreeTableColumn<>("Full name");
-        full_name.setPrefWidth(130);
+        full_name.setPrefWidth(140);
         full_name.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -140,7 +140,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> user_address = new JFXTreeTableColumn<>("Address");
-        user_address.setPrefWidth(120);
+        user_address.setPrefWidth(130);
         user_address.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -149,7 +149,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> phone_number = new JFXTreeTableColumn<>("Phone");
-        phone_number.setPrefWidth(110);
+        phone_number.setPrefWidth(120);
         phone_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -158,7 +158,7 @@ public class EmployeesScreenController implements Initializable {
         });
         
         JFXTreeTableColumn<Employee, String> start_date = new JFXTreeTableColumn<>("Start date");
-        start_date.setPrefWidth(100);
+        start_date.setPrefWidth(110);
         start_date.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -166,17 +166,8 @@ public class EmployeesScreenController implements Initializable {
             }
         });
         
-        JFXTreeTableColumn<Employee, String> user_salary = new JFXTreeTableColumn<>("Salary");
-        user_salary.setPrefWidth(90);
-        user_salary.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().salary;
-            }
-        });
-        
         JFXTreeTableColumn<Employee, String> user_type = new JFXTreeTableColumn<>("User type");
-        user_type.setPrefWidth(105);
+        user_type.setPrefWidth(115);
         user_type.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
@@ -191,7 +182,7 @@ public class EmployeesScreenController implements Initializable {
             ResultSet rs = ps.executeQuery();
             
             while(rs.next()) {
-                employees.add(new Employee(rs.getInt(1)+"", rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)));
+                employees.add(new Employee(rs.getInt(1)+"", rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8)));
             }
         } 
         catch (SQLException ex) {
@@ -199,7 +190,7 @@ public class EmployeesScreenController implements Initializable {
         }
         
         final TreeItem<Employee> root = new RecursiveTreeItem<Employee>(employees, RecursiveTreeObject::getChildren);
-        treeView.getColumns().setAll(id, user_name, pass, full_name, user_address, phone_number, start_date, user_salary, user_type);
+        treeView.getColumns().setAll(id, user_name, pass, full_name, user_address, phone_number, start_date, user_type);
         treeView.setRoot(root);
         treeView.setShowRoot(false);
     }
@@ -271,10 +262,9 @@ public class EmployeesScreenController implements Initializable {
     @FXML
     void insert(MouseEvent event) {
         int res = 0;
-        String sql = "INSERT INTO users (username,password,fullName,address,phone,startDate,salary,userType) VALUES (?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO users (username,password,fullName,address,phone,startDate,userType) VALUES (?,?,?,?,?,?,?)";
         Connection connection = DBConnection.getConnection();
         
-        //boolean ifEmpty = checkEmptyFields();
         if (!checkEmptyFields()) {
             try {
                 PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
@@ -284,8 +274,7 @@ public class EmployeesScreenController implements Initializable {
                 ps.setString(4, address.getText().toString());
                 ps.setString(5, phone.getText().toString());
                 ps.setString(6, startDate.getValue().toString());
-                ps.setString(7, salary.getText().toString());
-                ps.setString(8, userType.getValue());
+                ps.setString(7, userType.getValue().toString());
 
                 res = ps.executeUpdate();
             } 
@@ -317,7 +306,7 @@ public class EmployeesScreenController implements Initializable {
     void update(MouseEvent event) {
         String text = search_text.getText().toString().trim();
         int res = 0;
-        String sql = "UPDATE users SET username=?, password=?, fullName=?, address=?, phone=?, startDate=?, salary=?, userType=? WHERE id=?";
+        String sql = "UPDATE users SET username=?, password=?, fullName=?, address=?, phone=?, startDate=?, userType=? WHERE id=?";
         Connection connection = DBConnection.getConnection();
         
         if (!checkEmptyFields()) {
@@ -329,7 +318,6 @@ public class EmployeesScreenController implements Initializable {
                 ps.setString(4, address.getText().toString());
                 ps.setString(5, phone.getText().toString());
                 ps.setString(6, startDate.getValue().toString());
-                ps.setString(7, salary.getText().toString());
                 ps.setString(8, userType.getValue().toString());
                 ps.setString(9, text);
 
@@ -400,8 +388,6 @@ public class EmployeesScreenController implements Initializable {
         fullName.setText("");
         address.setText("");
         phone.setText("");
-        salary.setText("");
-        //startDate.
         userType.setValue("");
     }
     
@@ -419,7 +405,7 @@ public class EmployeesScreenController implements Initializable {
     private boolean checkEmptyFields() {
         if (username.getText().toString().equals("") || password.getText().toString().equals("") || fullName.getText().toString().equals("") || 
                 address.getText().toString().equals("") || phone.getText().toString().equals("") || startDate.getValue().toString().equals("") || 
-                salary.getText().toString().equals("") || userType.getValue().toString().equals("")) {
+                userType.getValue().toString().equals("")) {
             
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Error");

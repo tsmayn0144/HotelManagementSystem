@@ -222,6 +222,8 @@ public class HomeScreenAdminController implements Initializable {
                 Stage home = new Stage();
                 Parent root = null;
 
+                LoginScreenController.userRole = "";
+                
                 try {
                     root = FXMLLoader.load(getClass().getResource("LoginScreen.fxml"));
                 } catch (IOException ex) {

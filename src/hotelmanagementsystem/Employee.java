@@ -23,14 +23,13 @@ public class Employee extends RecursiveTreeObject<Employee> {
     StringProperty address;
     StringProperty phone;
     StringProperty startDate;
-    StringProperty salary;
     StringProperty userType;
     
     public Employee() {
         super();
     }
 
-    public Employee(String id, String username, String password, String fullName, String address, String phone, String startDate, String salary, String userType) {
+    public Employee(String id, String username, String password, String fullName, String address, String phone, String startDate, String userType) {
         this.id = new SimpleStringProperty(id);
         this.username = new SimpleStringProperty(username);
         this.password = new SimpleStringProperty(password);
@@ -38,7 +37,6 @@ public class Employee extends RecursiveTreeObject<Employee> {
         this.address = new SimpleStringProperty(address);
         this.phone = new SimpleStringProperty(phone);
         this.startDate = new SimpleStringProperty(startDate);
-        this.salary = new SimpleStringProperty(salary);
         this.userType = new SimpleStringProperty(userType);
     }
 }

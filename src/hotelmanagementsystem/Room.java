@@ -19,7 +19,8 @@ public class Room extends RecursiveTreeObject<Room> {
     StringProperty roomType;
     StringProperty roomNumber;
     StringProperty numberOfPeople;
-    StringProperty floorNumber;
+    StringProperty ac;
+    StringProperty balcony;
     StringProperty roomPhone;
     StringProperty roomPrice;
     StringProperty roomStatus;
@@ -28,12 +29,13 @@ public class Room extends RecursiveTreeObject<Room> {
         super();
     }
 
-    public Room(String id, String roomType, String roomNumber, String numberOfPeople, String floorNumber, String roomPhone, String roomPrice, String roomStatus) {
+    public Room(String id, String roomType, String roomNumber, String numberOfPeople, String ac, String balcony, String roomPhone, String roomPrice, String roomStatus) {
         this.id = new SimpleStringProperty(id);
         this.roomType = new SimpleStringProperty(roomType);
         this.roomNumber = new SimpleStringProperty(roomNumber);
         this.numberOfPeople = new SimpleStringProperty(numberOfPeople);
-        this.floorNumber = new SimpleStringProperty(floorNumber);
+        this.ac = new SimpleStringProperty(ac);
+        this.balcony = new SimpleStringProperty(balcony);
         this.roomPhone = new SimpleStringProperty(roomPhone);
         this.roomPrice = new SimpleStringProperty(roomPrice);
         this.roomStatus = new SimpleStringProperty(roomStatus);

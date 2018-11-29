@@ -36,37 +36,31 @@
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="password" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="75.0" prefWidth="220.0" promptText="Enter password" />
-                        <Label layoutX="26.0" layoutY="78.0" text="Password">
+                        <JFXTextField fx:id="password" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="85.0" prefWidth="220.0" promptText="Enter password" />
+                        <Label layoutX="26.0" layoutY="88.0" text="Password">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="fullName" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="125.0" prefWidth="220.0" promptText="Enter full name" />
-                        <Label layoutX="26.0" layoutY="128.0" text="Full name">
+                        <JFXTextField fx:id="fullName" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="145.0" prefWidth="220.0" promptText="Enter full name" />
+                        <Label layoutX="26.0" layoutY="148.0" text="Full name">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="address" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="175.0" prefWidth="220.0" promptText="Enter address" />
-                        <Label layoutX="26.0" layoutY="178.0" text="Address">
+                        <JFXTextField fx:id="address" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="203.0" prefWidth="220.0" promptText="Enter address" />
+                        <Label layoutX="26.0" layoutY="206.0" text="Address">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <JFXTextField fx:id="phone" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="225.0" prefWidth="220.0" promptText="Enter phone" />
-                        <Label layoutX="26.0" layoutY="228.0" text="Phone">
+                        <JFXTextField fx:id="phone" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="262.0" prefWidth="220.0" promptText="Enter phone" />
+                        <Label layoutX="26.0" layoutY="265.0" text="Phone">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <Label layoutX="26.0" layoutY="278.0" text="Start date">
-                           <font>
-                              <Font name="System Bold" size="13.0" />
-                           </font>
-                        </Label>
-                        <JFXTextField fx:id="salary" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="325.0" prefWidth="220.0" promptText="Enter salary" />
-                        <Label layoutX="26.0" layoutY="328.0" text="Salary">
+                        <Label layoutX="26.0" layoutY="318.0" text="Start date">
                            <font>
                               <Font name="System Bold" size="13.0" />
                            </font>
@@ -76,7 +70,7 @@
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </Label>
-                        <JFXDatePicker fx:id="startDate" defaultColor="#377ce8" editable="false" layoutX="105.0" layoutY="274.0" prefHeight="28.0" prefWidth="220.0" promptText="Choose start date" />
+                        <JFXDatePicker fx:id="startDate" defaultColor="#377ce8" editable="false" layoutX="105.0" layoutY="314.0" prefHeight="28.0" prefWidth="220.0" promptText="Choose start date" />
                         <JFXComboBox fx:id="userType" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="375.0" prefHeight="25.0" prefWidth="220.0" promptText="Enter user type" />
                      </children>
                   </Pane>

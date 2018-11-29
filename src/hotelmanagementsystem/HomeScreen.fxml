@@ -33,7 +33,7 @@
                         <Image url="@../img/001-interface-1.png" />
                      </image>
                   </ImageView>
-                  <Label layoutX="45.0" layoutY="143.0" text="Available Rooms" textFill="BLACK">
+                  <Label layoutX="32.0" layoutY="143.0" text="Rooms Management" textFill="BLACK">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
