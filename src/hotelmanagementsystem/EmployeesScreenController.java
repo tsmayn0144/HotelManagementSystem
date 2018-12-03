@@ -25,6 +25,9 @@ import java.time.LocalDate;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,6 +42,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -50,6 +54,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javax.print.DocFlavor;
 import org.controlsfx.control.Notifications;
 
 /**
@@ -87,17 +92,9 @@ public class EmployeesScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        startDate.setValue(LocalDate.now());
-        DateFormatting.dateFormatter(startDate);
-        pressedEnter(search_text);
-        
-        ObservableList userTypeList = FXCollections.observableArrayList();
-        userTypeList.add("admin");
-        userTypeList.add("normal");
-        userType.setItems(userTypeList);
-        
-        userType.setValue("");
-        
+        initializeData();
+        treeViewSelectionListener();
+
         loadAllEmployees("SELECT * FROM users");
     }    
     
@@ -108,7 +105,7 @@ public class EmployeesScreenController implements Initializable {
         id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().id;
+                return param.getValue().getValue().getId();
             }
         });
         
@@ -117,7 +114,7 @@ public class EmployeesScreenController implements Initializable {
         user_name.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().username;
+                return param.getValue().getValue().getUsername();
             }
         });
         
@@ -126,7 +123,7 @@ public class EmployeesScreenController implements Initializable {
         pass.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().password;
+                return param.getValue().getValue().getPassword();
             }
         });
         
@@ -135,7 +132,7 @@ public class EmployeesScreenController implements Initializable {
         full_name.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().fullName;
+                return param.getValue().getValue().getFullName();
             }
         });
         
@@ -144,7 +141,7 @@ public class EmployeesScreenController implements Initializable {
         user_address.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().address;
+                return param.getValue().getValue().getAddress();
             }
         });
         
@@ -153,7 +150,7 @@ public class EmployeesScreenController implements Initializable {
         phone_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().phone;
+                return param.getValue().getValue().getPhone();
             }
         });
         
@@ -162,7 +159,7 @@ public class EmployeesScreenController implements Initializable {
         start_date.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().startDate;
+                return param.getValue().getValue().getStartDate();
             }
         });
         
@@ -171,7 +168,7 @@ public class EmployeesScreenController implements Initializable {
         user_type.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Employee, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Employee, String> param) {
-                return param.getValue().getValue().userType;
+                return param.getValue().getValue().getUserType();
             }
         });
         
@@ -248,10 +245,31 @@ public class EmployeesScreenController implements Initializable {
     
     @FXML
     void search() {
-        loadAllEmployees("SELECT * FROM users WHERE id='" + search_text.getText().toString().trim() + "'");
         if (search_text.getText().toString().equals("")) {
             loadAllEmployees("SELECT * FROM users");
         }
+        else {
+            String text = search_text.getText().toString();
+            String firstLetter = String.valueOf(search_text.getText().charAt(0));
+            
+            if (Character.isLowerCase(text.charAt(0))) {
+                text = search_text.getText().replace(firstLetter, firstLetter.toUpperCase());
+                /*loadAllEmployees("SELECT * FROM users WHERE fullName LIKE '%" + search_text.getText().toString().trim() + "%' OR "
+                    + "fullName LIKE '" + text + "%' OR fullName LIKE '%" + text + "%'");*/
+            }
+            else if (Character.isUpperCase(text.charAt(0))) {
+                text = search_text.getText().replace(firstLetter, firstLetter.toLowerCase());
+            }
+
+            String text_uppercase = search_text.getText().toString().toLowerCase(); // String sprowadza ewentualne łańcuchy pisane wielkimi 
+                                                                                    // literami do lowercase'a
+            text_uppercase = text_uppercase.replace(String.valueOf(text_uppercase.charAt(0)), String.valueOf(text_uppercase.charAt(0)).toUpperCase());
+            loadAllEmployees("SELECT * FROM users WHERE fullName LIKE '%" + search_text.getText().toString().trim() + "%' OR "
+                    + "fullName LIKE '" + text + "%' OR fullName LIKE '%" + text + "%' OR fullName LIKE '%" + text.toLowerCase() + "%' OR "
+                    + "fullName LIKE '" + text_uppercase + "%' OR fullName LIKE '%" + text_uppercase + "%'");
+        }
+
+        clearForm();
     }
     
     @FXML
@@ -304,22 +322,76 @@ public class EmployeesScreenController implements Initializable {
 
     @FXML
     void update(MouseEvent event) {
-        String text = search_text.getText().toString().trim();
-        int res = 0;
-        String sql = "UPDATE users SET username=?, password=?, fullName=?, address=?, phone=?, startDate=?, userType=? WHERE id=?";
-        Connection connection = DBConnection.getConnection();
+        if (treeView.getSelectionModel().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Update error");
+            alert.setHeaderText("No user selected");
+            alert.setContentText("In order to update a user, you need to choose the user first.");
+            alert.showAndWait();
+        }
+        else {
+            String id = String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getId().getValueSafe());
+
+            int res = 0;
+            String sql = "UPDATE users SET username=?, password=?, fullName=?, address=?, phone=?, startDate=?, userType=? WHERE id=?";
+            Connection connection = DBConnection.getConnection();
+
+            if (!checkEmptyFields()) {
+                try {
+                    PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
+                    ps.setString(1, username.getText().toString());
+                    ps.setString(2, password.getText().toString());
+                    ps.setString(3, fullName.getText().toString());
+                    ps.setString(4, address.getText().toString());
+                    ps.setString(5, phone.getText().toString());
+                    ps.setString(6, startDate.getValue().toString());
+                    ps.setString(7, userType.getValue().toString());
+                    ps.setString(8, id);
+
+                    res = ps.executeUpdate();
+                } catch (SQLException e) {
+                    Logger.getLogger(EmployeesScreenController.class.getName()).log(Level.SEVERE, null, e);
+                }
+
+                if (res > 0) {
+                    Image image = new Image("img/mooo.png");
+                    Notifications notification = Notifications.create().title("Done").text("User updated successfully")
+                            .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
+                    notification.darkStyle();
+                    notification.show();
+                    loadAllEmployees("SELECT * FROM users");
+                    clearForm();
+                    search_text.setText("");
+                } else {
+                    Image image = new Image("img/delete.png");
+                    Notifications notification = Notifications.create().title("Error").text("Something went wrong (check if username is not taken).")
+                            .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
+                    notification.darkStyle();
+                    notification.show();
+                }
+            }
+        }
         
-        if (!checkEmptyFields()) {
+    }
+    
+    @FXML
+    void delete(MouseEvent event) {
+        if (treeView.getSelectionModel().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Delete error");
+            alert.setHeaderText("No user selected");
+            alert.setContentText("In order to delete a user, you need to choose the user first.");
+            alert.showAndWait();
+        }
+        else {
+            String id = String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getId().getValueSafe());
+            int res = 0;
+            String sql = "DELETE FROM users WHERE id=?";
+            Connection connection = DBConnection.getConnection();
+
             try {
                 PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
-                ps.setString(1, username.getText().toString());
-                ps.setString(2, password.getText().toString());
-                ps.setString(3, fullName.getText().toString());
-                ps.setString(4, address.getText().toString());
-                ps.setString(5, phone.getText().toString());
-                ps.setString(6, startDate.getValue().toString());
-                ps.setString(8, userType.getValue().toString());
-                ps.setString(9, text);
+                ps.setString(1, id);
 
                 res = ps.executeUpdate();
             } 
@@ -329,56 +401,19 @@ public class EmployeesScreenController implements Initializable {
 
             if (res > 0) {
                 Image image = new Image("img/mooo.png");
-                Notifications notification = Notifications.create().title("Done").text("User updated successfully")
+                Notifications notification = Notifications.create().title("Done").text("User removed successfully.")
                         .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
                 notification.darkStyle();
                 notification.show();
                 loadAllEmployees("SELECT * FROM users");
-                clearForm();
                 search_text.setText("");
-            } 
-            else {
+            } else {
                 Image image = new Image("img/delete.png");
-                Notifications notification = Notifications.create().title("Error").text("Something went wrong (check if username is not taken).")
+                Notifications notification = Notifications.create().title("Error").text("Something went wrong.")
                         .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
                 notification.darkStyle();
                 notification.show();
             }
-        }
-    }
-    
-    @FXML
-    void delete(MouseEvent event) {
-        String text = search_text.getText().toString().trim();
-        int res = 0;
-        String sql = "DELETE FROM users WHERE id=?";
-        Connection connection = DBConnection.getConnection();
-        
-        try {
-            PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
-            ps.setString(1, text);
-            
-            res = ps.executeUpdate();
-        } 
-        catch (SQLException ex) {
-            Logger.getLogger(EmployeesScreenController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        if (res > 0) {
-            Image image = new Image("img/mooo.png");
-            Notifications notification = Notifications.create().title("Done").text("User removed successfully")
-                    .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
-            notification.darkStyle();
-            notification.show();
-            loadAllEmployees("SELECT * FROM users");
-            search_text.setText("");
-        }
-        else {
-            Image image = new Image("img/delete.png");
-            Notifications notification = Notifications.create().title("Error").text("Something went wrong")
-                    .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
-            notification.darkStyle();
-            notification.show();
         }
     }
 
@@ -389,6 +424,7 @@ public class EmployeesScreenController implements Initializable {
         address.setText("");
         phone.setText("");
         userType.setValue("");
+        startDate.setValue(LocalDate.now());
     }
     
     private void pressedEnter(JFXTextField textfield) {
@@ -417,5 +453,37 @@ public class EmployeesScreenController implements Initializable {
         }
         else 
             return false;
+    }
+
+    private void treeViewSelectionListener() {
+        treeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Employee>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<Employee>> observable, TreeItem<Employee> oldValue, TreeItem<Employee> newValue) {
+                //String name = treeView.getSelectionModel().getSelectedItem().getValue().getFullName().getValueSafe();
+                search_text.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getFullName().getValueSafe()));
+
+                username.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getUsername().getValueSafe()));
+                password.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getPassword().getValueSafe()));
+                fullName.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getFullName().getValueSafe()));
+                address.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getAddress().getValueSafe()));
+                phone.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getPhone().getValueSafe()));
+                userType.setValue(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getUserType().getValueSafe()));
+                startDate.setValue(LocalDate.parse(treeView.getSelectionModel().getSelectedItem().getValue().getStartDate().getValue()));
+            }
+        });
+    }
+
+    private void initializeData() {
+        startDate.setValue(LocalDate.now());
+        DateFormatting.dateFormatter(startDate);
+        
+        pressedEnter(search_text);
+        
+        ObservableList userTypeList = FXCollections.observableArrayList();
+        userTypeList.add("admin");
+        userTypeList.add("normal");
+        userType.setItems(userTypeList);
+        
+        //userType.setValue("");
     }
 }

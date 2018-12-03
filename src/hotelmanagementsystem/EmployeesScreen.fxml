@@ -18,16 +18,12 @@
             <JFXTreeTableView fx:id="treeView" layoutX="576.0" layoutY="14.0" opacity="0.8" prefHeight="700.0" prefWidth="811.0" stylesheets="@hotel.css" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="430.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
             <Pane layoutX="14.0" layoutY="15.0" opacity="0.8" prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #fff; -fx-background-radius: 6 px;" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="15.0">
                <children>
-                  <JFXButton buttonType="RAISED" layoutX="115.0" layoutY="649.0" onMouseClicked="#back" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="35.0" layoutY="23.0" onMouseClicked="#search" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Search" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="201.0" layoutY="649.0" onMouseClicked="#close" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </JFXButton>
+                  <JFXTextField fx:id="search_text" focusColor="#377ce8" labelFloat="true" layoutX="131.0" layoutY="26.0" prefHeight="25.0" prefWidth="220.0" promptText="Search employee by name" />
                   <Pane layoutX="25.0" layoutY="79.0" prefHeight="432.0" prefWidth="350.0" style="-fx-border-radius: 15; -fx-border-color: #ccc; -fx-border-width: 2 px;">
                      <children>
                         <JFXTextField fx:id="username" focusColor="#377ce8" labelFloat="true" layoutX="105.0" layoutY="25.0" prefWidth="220.0" promptText="Enter username" />
@@ -98,12 +94,16 @@
                         </JFXButton>
                      </children>
                   </Pane>
-                  <JFXButton buttonType="RAISED" layoutX="35.0" layoutY="23.0" onMouseClicked="#search" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Search" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="115.0" layoutY="649.0" onMouseClicked="#back" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXTextField fx:id="search_text" focusColor="#377ce8" labelFloat="true" layoutX="131.0" layoutY="26.0" prefHeight="25.0" prefWidth="220.0" promptText="Search employee by id" />
+                  <JFXButton buttonType="RAISED" layoutX="201.0" layoutY="649.0" onMouseClicked="#close" prefHeight="30.0" prefWidth="80.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </JFXButton>
                </children>
             </Pane>
          </children>

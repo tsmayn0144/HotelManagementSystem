@@ -12,6 +12,10 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXTreeTableColumn;
+import com.jfoenix.controls.JFXTreeTableView;
+import com.jfoenix.controls.RecursiveTreeItem;
+import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import com.mysql.jdbc.PreparedStatement;
 import java.io.IOException;
 import java.net.URL;
@@ -19,7 +23,9 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +42,8 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -45,6 +53,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.controlsfx.control.Notifications;
@@ -86,133 +95,42 @@ public class ReservationScreenController implements Initializable {
     private StackPane stackepane;
     @FXML
     private JFXTextField discount;
-
+    @FXML
+    private JFXTreeTableView<Room> treeView;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        discount.setText("0");
-        startDate.setValue(LocalDate.now());
-        endDate.setValue(LocalDate.now().plusDays(1));
+        initializeValues();
+        addAllListeners();
+        treeViewSelectionListener();
         
-        duration.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue) {
-                    endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
-                }
-                    /////////////////////////
-                if (!newValue && !price.getText().equals("") && !discount.getText().equals("")) {
-                    double sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString()); 
-                    double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString())/100) * sum1);
-                    int sum = (int)sum2;
-                    total.setText(String.valueOf(sum));
-                }
-            }
-        });
+        //loadAvailableRooms("SELECT * FROM room");
+    }
 
-        startDate.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue) {
-                    endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
-                }
-            }
-        });
-        
-        roomNumber.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue) { 
-                    String sql = "SELECT roomPrice,roomType FROM room WHERE roomNumber=?";
-                    
-                    Connection connection = DBConnection.getConnection();
-                    try {
-                        PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
-                        ps.setString(1, roomNumber.getText().toString());
-                        ResultSet rs = ps.executeQuery();
-
-                        if (rs.next()) {
-                            price.setText(rs.getString(1));
-                            roomType.setText(rs.getString(2));
-                        }
-                        else {
-                            price.setText("");
-                            total.setText("");
-                            roomType.setText("");
-                        }
-                    } 
-                    catch (SQLException ex) {
-                        Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                    //////////////////////////////
-                if (!newValue && !duration.getText().equals("") && !price.getText().equals("") && !discount.getText().equals("")) {
-                    double sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString()); 
-                    double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString())/100) * sum1);
-                    int sum = (int)sum2;
-                    total.setText(String.valueOf(sum));
-                }
-            }
-        });
-        
-        discount.focusedProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue && !duration.getText().equals("") && !price.getText().equals("")) {
-                    double sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString()); 
-                    double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString())/100) * sum1);
-                    int sum = (int)sum2;
-                    total.setText(String.valueOf(sum));
-                }
-            }
-        });
-        
-        DateFormatting.dateFormatter(startDate);
-        DateFormatting.dateFormatter(endDate);
-        
-        ObservableList numPeopleList = FXCollections.observableArrayList();
-        numPeopleList.add("1");
-        numPeopleList.add("2");
-        numPeopleList.add("3");
-        numPeopleList.add("4");
-        numPeopleList.add("5");
-        numPeopleList.add("6");
-        numPeopleList.add("7");
-        numPeopleList.add("8");
-        num_people.setItems(numPeopleList);
-        
-        ObservableList paymentTypeList = FXCollections.observableArrayList();
-        paymentTypeList.add("card");
-        paymentTypeList.add("cash");
-        paymentTypeList.add("paypal");
-        paymentTypeList.add("transfer");
-        paymentType.setItems(paymentTypeList);
-    }  
-    
     @FXML
     private void back(MouseEvent event) {
         Stage home = new Stage();
         Parent root = null;
-        
+
         try {
-            if (LoginScreenController.userRole.equals("admin")) 
+            if (LoginScreenController.userRole.equals("admin")) {
                 root = FXMLLoader.load(getClass().getResource("HomeScreenAdmin.fxml"));
-            else
+            } else {
                 root = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
-        } 
-        catch (IOException ex) {
+            }
+        } catch (IOException ex) {
             Logger.getLogger(AdminScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        Stage current = (Stage)roomNumber.getScene().getWindow();
+
+        Stage current = (Stage) roomNumber.getScene().getWindow();
         Scene scene = new Scene(root);
-        
+
         home.setScene(scene);
         home.initStyle(StageStyle.TRANSPARENT);
-        
+
         current.hide();
         home.show();
     }
@@ -222,26 +140,26 @@ public class ReservationScreenController implements Initializable {
         JFXDialogLayout dialogLayout = new JFXDialogLayout();
         dialogLayout.setHeading(new Text("Close"));
         dialogLayout.setBody(new Text("Do you want to exit?"));
-        
+
         JFXButton ok = new JFXButton("Ok");
         JFXButton cancel = new JFXButton("Cancel");
-        
+
         JFXDialog dialog = new JFXDialog(stackepane, dialogLayout, JFXDialog.DialogTransition.CENTER);
-        
+
         ok.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 System.exit(0);
             }
         });
-        
+
         cancel.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 dialog.close();
             }
         });
-        
+
         dialogLayout.setActions(ok, cancel);
         dialog.show();
     }
@@ -256,8 +174,8 @@ public class ReservationScreenController implements Initializable {
         int res1 = 0;
         String sql1 = "INSERT INTO customer (name, email, address, phone) VALUES (?, ?, ?, ?)";
         Connection connection = DBConnection.getConnection();
-        
-        if(!checkEmptyFields()) {
+
+        if (!checkEmptyFields()) {
             //////////////////////// CUSTOMER ///////////////////////
             try {
                 PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql1);
@@ -279,19 +197,20 @@ public class ReservationScreenController implements Initializable {
                 notification.darkStyle();
                 notification.show();
             }
+
+            //////// clientId
             
             String client_id = ""; // zczytywanie z bazy clientId w celu dodania go do tabeli reservation
             String sql2 = "SELECT max(id) FROM customer";
-            //connection = DBConnection.getConnection();
+            
             try {
-                PreparedStatement ps2 = (PreparedStatement)connection.prepareStatement(sql2);
+                PreparedStatement ps2 = (PreparedStatement) connection.prepareStatement(sql2);
                 ResultSet rs = ps2.executeQuery();
 
                 while (rs.next()) {
                     client_id = rs.getString(1);
                 }
-            } 
-            catch (SQLException ex) {
+            } catch (SQLException ex) {
                 Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (client_id == "") {
@@ -301,14 +220,14 @@ public class ReservationScreenController implements Initializable {
                 notification.darkStyle();
                 notification.show();
             }
-            
+
             ////////////////////// RESERVATION //////////////////////
             int res3 = 0;
             String sql3 = "INSERT INTO reservation (clientId, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try {
-                PreparedStatement ps3 = (PreparedStatement)connection.prepareStatement(sql3);
+                PreparedStatement ps3 = (PreparedStatement) connection.prepareStatement(sql3);
 
                 ps3.setString(1, client_id);
                 ps3.setString(2, roomNumber.getText().toString());
@@ -332,7 +251,11 @@ public class ReservationScreenController implements Initializable {
                         .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
                 notification.darkStyle();
                 notification.show();
-                updateStatus();
+                if (startDate.getValue().toString().equals(LocalDate.now().toString())) {
+                    System.out.println(startDate.getValue().toString());
+                    System.out.println(LocalDate.now().toString());
+                    updateStatus();
+                }
             } 
             else {
                 Image image = new Image("img/delete.png");
@@ -341,15 +264,14 @@ public class ReservationScreenController implements Initializable {
                 notification.darkStyle();
                 notification.show();
             }
-            
+
             //////////////////// CUSTOMER_RESERVATION_DATA //////////////////////////////////
-            
             int res = 0;
             String sql = "INSERT INTO customerreservationdata (clientId, name, email, address, phone, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
             try {
-                PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
+                PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
 
                 ps.setString(1, client_id);
                 ps.setString(2, name.getText().toString());
@@ -364,13 +286,13 @@ public class ReservationScreenController implements Initializable {
                 ps.setString(11, paymentType.getValue().toString());
                 ps.setString(12, discount.getText().toString());
                 ps.setString(13, total.getText().toString());
-                
+
                 res = ps.executeUpdate();
-                
-                if(res > 0)
+
+                if (res > 0) {
                     clearForm();
-            } 
-            catch (SQLException ex) {
+                }
+            } catch (SQLException ex) {
                 Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -378,45 +300,45 @@ public class ReservationScreenController implements Initializable {
 
     @FXML
     private void print(MouseEvent event) { // puste na razie - do implementacji
-        
+
     }
 
     private void updateStatus() {
         String text = roomNumber.getText().toString().trim();
         String sql = "UPDATE room SET roomStatus=? WHERE roomNumber=?";
         Connection connection = DBConnection.getConnection();
-        
+
         try {
-            PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
+            PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
             ps.setString(1, "busy");
             ps.setString(2, text);
-            
+
             ps.executeUpdate();
-        } 
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private boolean checkEmptyFields() {
-        if (name.getText().toString().equals("") || email.getText().toString().equals("") || address.getText().toString().equals("") || 
-                phone.getText().toString().equals("") || num_people.getValue().toString().equals("") || paymentType.getValue().toString().equals("") || 
-                duration.getText().toString().equals("") || roomType.getText().toString().equals("") || roomNumber.getText().toString().equals("") || 
-                startDate.getValue().toString().equals("") || endDate.getValue().toString().equals("") || price.getText().toString().equals("") || 
-                discount.getText().toString().equals("") || total.getText().toString().equals("")) {
-            
+        if (name.getText().toString().equals("") || email.getText().toString().equals("") || address.getText().toString().equals("")
+                || phone.getText().toString().equals("") || num_people.getValue().toString().equals("") || paymentType.getValue().toString().equals("")
+                || duration.getText().toString().equals("") || roomType.getText().toString().equals("") || roomNumber.getText().toString().equals("")
+                || startDate.getValue().toString().equals("") || endDate.getValue().toString().equals("") || price.getText().toString().equals("")
+                || discount.getText().toString().equals("") || total.getText().toString().equals("")) {
+
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Error");
             alert.setHeaderText("One or more fields are empty");
             alert.setContentText("Please fill all the required fields.");
             alert.showAndWait();
-            
+
             return true;
-        }
-        else 
+        } 
+        else {
             return false;
+        }
     }
-    
+
     private void clearForm() {
         name.setText("");
         email.setText("");
@@ -428,10 +350,297 @@ public class ReservationScreenController implements Initializable {
         roomType.setText("");
         roomNumber.setText("");
         price.setText("");
-        discount.setText("");
+        discount.setText("0");
         total.setText("");
         startDate.setValue(LocalDate.now());
         endDate.setValue(LocalDate.now().plusDays(1));
     }
+
+    private void addAllListeners() {
+        duration.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue) {
+                    endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
+                }
+                /////////////////////////
+                if (!newValue && !price.getText().equals("") && !discount.getText().equals("")) {
+                    countTotal();
+                }
+            }
+        });
+
+        startDate.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue) {
+                    if (startDate.getValue().isBefore(LocalDate.now())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Date error");
+                        alert.setHeaderText("Start date can not occur before today.");
+                        alert.setContentText("Please choose correct date and try again.");
+                        alert.showAndWait();
+                        startDate.setValue(LocalDate.now());
+                    }
+                    else {
+                        //if (startDate.getValue().isAfter(endDate.getValue()) && duration.getText().toString().equals("")) {
+                        if (duration.getText().toString().equals("")) {
+                            endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(1));
+                        } 
+                        else {
+                            endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
+                        }
+                    }
+                }
+            }
+        });
+
+        endDate.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue) {
+                    //if (endDate.getValue().isBefore(startDate.getValue()) && duration.getText().toString().equals("")) {
+                    if (startDate.getValue().isAfter(endDate.getValue())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Date error");
+                        alert.setHeaderText("Incorrect end date");
+                        alert.setContentText("The end date has to be after the start date. Please choose end date again.");
+                        alert.showAndWait();
+                        
+                        if (duration.getText().toString().equals("")) {
+                            endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(1));
+                        } 
+                        else {
+                            endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
+                        }
+                    }
+                    else {
+                        Period period = Period.between(LocalDate.from(startDate.getValue()), LocalDate.from(endDate.getValue()));
+                        int diff = period.getDays();
+                        duration.setText(String.valueOf(diff));
+                    }
+                }
+            }
+        });
+
+        roomNumber.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue) {
+                    String sql = "SELECT roomPrice,roomType FROM room WHERE roomNumber=?";
+
+                    Connection connection = DBConnection.getConnection();
+                    try {
+                        PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
+                        ps.setString(1, roomNumber.getText().toString());
+                        ResultSet rs = ps.executeQuery();
+
+                        if (rs.next()) {
+                            price.setText(rs.getString(1));
+                            roomType.setText(rs.getString(2));
+                        } 
+                        else {
+                            price.setText("");
+                            total.setText("");
+                            roomType.setText("");
+                        }
+                    } 
+                    catch (SQLException ex) {
+                        Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                //////////////////////////////
+                if (!newValue && !duration.getText().equals("") && !price.getText().equals("") && !discount.getText().equals("")) {
+                    countTotal();
+                }
+            }
+        });
+
+        discount.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                if (!newValue && !duration.getText().equals("") && !price.getText().equals("")) {
+                    countTotal();
+                }
+            }
+        });
+    }
+
+    private void initializeValues() {
+        discount.setText("0");
+        startDate.setValue(LocalDate.now());
+        endDate.setValue(LocalDate.now().plusDays(1));
+        num_people.setValue("");
+        paymentType.setValue("");
+        
+        DateFormatting.dateFormatter(startDate);
+        DateFormatting.dateFormatter(endDate);
+
+        ObservableList numPeopleList = FXCollections.observableArrayList();
+        numPeopleList.add("1");
+        numPeopleList.add("2");
+        numPeopleList.add("3");
+        numPeopleList.add("4");
+        numPeopleList.add("5");
+        numPeopleList.add("6");
+        numPeopleList.add("7");
+        numPeopleList.add("8");
+        num_people.setItems(numPeopleList);
+
+        ObservableList paymentTypeList = FXCollections.observableArrayList();
+        paymentTypeList.add("card");
+        paymentTypeList.add("cash");
+        paymentTypeList.add("paypal");
+        paymentTypeList.add("transfer");
+        paymentType.setItems(paymentTypeList);
+    }
     
+    private void loadAvailableRooms(String sql) {
+        
+        JFXTreeTableColumn<Room, String> id = new JFXTreeTableColumn<>("Id");
+        id.setPrefWidth(65);
+        id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getId();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> room_number = new JFXTreeTableColumn<>("Room nr");
+        room_number.setPrefWidth(90);
+        room_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getRoomNumber();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> room_type = new JFXTreeTableColumn<>("Type");
+        room_type.setPrefWidth(80);
+        room_type.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getRoomType();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> num_of_people = new JFXTreeTableColumn<>("Num. of ppl");
+        num_of_people.setPrefWidth(90);
+        num_of_people.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getNumberOfPeople();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> ac = new JFXTreeTableColumn<>("A/C");
+        ac.setPrefWidth(81);
+        ac.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getAc();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> balcony = new JFXTreeTableColumn<>("Balcony");
+        balcony.setPrefWidth(90);
+        balcony.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getBalcony();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> room_phone = new JFXTreeTableColumn<>("Room phone");
+        room_phone.setPrefWidth(100);
+        room_phone.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getRoomPhone();
+            }
+        });
+        
+        JFXTreeTableColumn<Room, String> room_price = new JFXTreeTableColumn<>("Room price ($)");
+        room_price.setPrefWidth(95);
+        room_price.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
+            @Override
+            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
+                return param.getValue().getValue().getRoomPrice();
+            }
+        });
+        
+        ObservableList<Room> rooms = FXCollections.observableArrayList();
+        Connection connection = DBConnection.getConnection();
+        try {
+            PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
+            
+            ps.setString(1, num_people.getValue().toString());
+            ps.setString(2, startDate.getValue().toString());
+            ps.setString(3, endDate.getValue().toString());
+            ps.setString(4, startDate.getValue().toString());
+            ps.setString(5, endDate.getValue().toString());
+            ps.setString(6, startDate.getValue().toString());
+            ps.setString(7, startDate.getValue().toString());
+            ps.setString(8, endDate.getValue().toString());
+            ps.setString(9, endDate.getValue().toString());
+            //ps.setString(10, startDate.getValue().toString());
+            
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()) {
+                rooms.add(new Room(rs.getInt(1)+"", rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9)));
+            }
+        } 
+        catch (SQLException ex) {
+            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        final TreeItem<Room> root = new RecursiveTreeItem<Room>(rooms, RecursiveTreeObject::getChildren);
+        treeView.getColumns().setAll(id, room_number, room_type, num_of_people, ac, balcony, room_phone, room_price);
+        treeView.setRoot(root);
+        treeView.setShowRoot(false);
+    }
+    
+    private void treeViewSelectionListener() {
+        treeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Room>>() {
+            @Override
+            public void changed(ObservableValue<? extends TreeItem<Room>> observable, TreeItem<Room> oldValue, TreeItem<Room> newValue) {
+                roomNumber.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomNumber().getValueSafe()));
+                roomType.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomType().getValueSafe()));
+                price.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomPrice().getValueSafe()));
+            
+                countTotal();
+            } 
+        });
+    }
+
+    @FXML
+    private void showRooms(MouseEvent event) {
+        /*
+        SELECT * FROM room WHERE room.numberOfPeople>=2 AND room.roomNumber NOT IN (SELECT room.roomNumber FROM reservation, room WHERE reservation.roomNumber=room.roomNumber AND (((reservation.startDate >= '2018-12-02' AND reservation.startDate < '2018-12-10') OR (reservation.endDate > '2018-12-02' AND reservation.endDate <= '2018-12-10')) OR (('2018-12-02' >= reservation.startDate AND '2018-12-02' < reservation.endDate) OR ('2018-12-10' > reservation.startDate AND '2018-12-10' <= reservation.endDate))))
+        */
+        //loadAvailableRooms("SELECT * FROM room");
+        if (num_people.getValue().toString().equals("")) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Searching error");
+            alert.setHeaderText("'How many people' field is empty");
+            alert.setContentText("Please choose number of people and try again.");
+            alert.showAndWait();
+        }
+        else {
+            loadAvailableRooms("SELECT * FROM room WHERE room.numberOfPeople>=? AND room.roomNumber NOT IN "
+                + "(SELECT room.roomNumber FROM reservation, room WHERE reservation.roomNumber=room.roomNumber AND "
+                + "(((reservation.startDate >= ? AND reservation.startDate < ?) OR "
+                + "(reservation.endDate > ? AND reservation.endDate <= ?)) OR "
+                + "((? >= reservation.startDate AND ? < reservation.endDate) OR "
+                + "(? > reservation.startDate AND ? <= reservation.endDate))))");
+        }
+    }
+    
+    private void countTotal() {
+        double sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString());
+        double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString()) / 100) * sum1);
+        int sum = (int) sum2;
+        total.setText(String.valueOf(sum));
+    }
 }

@@ -88,7 +88,7 @@ public class RoomsScreenController implements Initializable {
         room_id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().id;
+                return param.getValue().getValue().getId();
             }
         });
         
@@ -97,7 +97,7 @@ public class RoomsScreenController implements Initializable {
         room_type.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().roomType;
+                return param.getValue().getValue().getRoomType();
             }
         });
         
@@ -106,7 +106,7 @@ public class RoomsScreenController implements Initializable {
         room_number.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().roomNumber;
+                return param.getValue().getValue().getRoomNumber();
             }
         });
         
@@ -115,7 +115,7 @@ public class RoomsScreenController implements Initializable {
         num_of_people.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().numberOfPeople;
+                return param.getValue().getValue().getNumberOfPeople();
             }
         });
         
@@ -124,7 +124,7 @@ public class RoomsScreenController implements Initializable {
         ac.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().ac;
+                return param.getValue().getValue().getAc();
             }
         });
         
@@ -133,7 +133,7 @@ public class RoomsScreenController implements Initializable {
         balcony.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().balcony;
+                return param.getValue().getValue().getBalcony();
             }
         });
         
@@ -142,7 +142,7 @@ public class RoomsScreenController implements Initializable {
         room_phone.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().roomPhone;
+                return param.getValue().getValue().getRoomPhone();
             }
         });
         
@@ -151,7 +151,7 @@ public class RoomsScreenController implements Initializable {
         room_price.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().roomPrice;
+                return param.getValue().getValue().getRoomPrice();
             }
         });
         
@@ -160,7 +160,7 @@ public class RoomsScreenController implements Initializable {
         room_status.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<Room, String>, ObservableValue<String>>() {
             @Override
             public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<Room, String> param) {
-                return param.getValue().getValue().roomStatus;
+                return param.getValue().getValue().getRoomStatus();
             }
         });
         

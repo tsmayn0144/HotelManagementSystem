@@ -16,14 +16,46 @@ import javafx.beans.property.StringProperty;
 
 public class Employee extends RecursiveTreeObject<Employee> {
     
-    StringProperty id;
-    StringProperty username;
-    StringProperty password;
-    StringProperty fullName;
-    StringProperty address;
-    StringProperty phone;
-    StringProperty startDate;
-    StringProperty userType;
+    private StringProperty id;
+    private StringProperty username;
+    private StringProperty password;
+    private StringProperty fullName;
+    private StringProperty address;
+    private StringProperty phone;
+    private StringProperty startDate;
+    private StringProperty userType;
+
+    public StringProperty getId() {
+        return id;
+    }
+
+    public StringProperty getUsername() {
+        return username;
+    }
+
+    public StringProperty getPassword() {
+        return password;
+    }
+
+    public StringProperty getFullName() {
+        return fullName;
+    }
+    
+    public StringProperty getAddress() {
+        return address;
+    }
+
+    public StringProperty getPhone() {
+        return phone;
+    }
+
+    public StringProperty getStartDate() {
+        return startDate;
+    }
+
+    public StringProperty getUserType() {
+        return userType;
+    }
     
     public Employee() {
         super();

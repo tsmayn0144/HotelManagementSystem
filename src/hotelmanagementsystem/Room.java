@@ -15,15 +15,15 @@ import javafx.beans.property.StringProperty;
  */
 public class Room extends RecursiveTreeObject<Room> {
     
-    StringProperty id;
-    StringProperty roomType;
-    StringProperty roomNumber;
-    StringProperty numberOfPeople;
-    StringProperty ac;
-    StringProperty balcony;
-    StringProperty roomPhone;
-    StringProperty roomPrice;
-    StringProperty roomStatus;
+    private StringProperty id;
+    private StringProperty roomType;
+    private StringProperty roomNumber;
+    private StringProperty numberOfPeople;
+    private StringProperty ac;
+    private StringProperty balcony;
+    private StringProperty roomPhone;
+    private StringProperty roomPrice;
+    private StringProperty roomStatus;
     
     public Room() {
         super();
@@ -40,4 +40,42 @@ public class Room extends RecursiveTreeObject<Room> {
         this.roomPrice = new SimpleStringProperty(roomPrice);
         this.roomStatus = new SimpleStringProperty(roomStatus);
     }
+
+    public StringProperty getId() {
+        return id;
+    }
+
+    public StringProperty getRoomType() {
+        return roomType;
+    }
+
+    public StringProperty getRoomNumber() {
+        return roomNumber;
+    }
+
+    public StringProperty getNumberOfPeople() {
+        return numberOfPeople;
+    }
+
+    public StringProperty getAc() {
+        return ac;
+    }
+
+    public StringProperty getBalcony() {
+        return balcony;
+    }
+
+    public StringProperty getRoomPhone() {
+        return roomPhone;
+    }
+
+    public StringProperty getRoomPrice() {
+        return roomPrice;
+    }
+
+    public StringProperty getRoomStatus() {
+        return roomStatus;
+    }
+    
+    
 }

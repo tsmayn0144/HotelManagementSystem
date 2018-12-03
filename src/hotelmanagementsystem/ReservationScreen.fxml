@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXDatePicker?>
 <?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
@@ -14,121 +15,130 @@
    <children>
       <AnchorPane id="AnchorPane" prefHeight="730.0" prefWidth="1366.0" style="-fx-background-image:url(img/pexels-photo-271643.jpeg)">
          <children>
-            <Pane layoutX="44.0" layoutY="96.0" opacity="0.8" prefHeight="475.0" prefWidth="384.0" style="-fx-background-color:white; -fx-background-radius:6px;">
+            <Pane layoutX="19.0" layoutY="96.0" opacity="0.8" prefHeight="475.0" prefWidth="328.0" style="-fx-background-color:white; -fx-background-radius:6px;">
                <children>
-                  <Label layoutX="26.0" layoutY="40.0" text="Customer name:">
+                  <Label layoutX="16.0" layoutY="40.0" text="Customer name:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="name" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="38.0" prefWidth="200.0" promptText="Customer name" />
-                  <Label layoutX="26.0" layoutY="96.0" text="Phone number:">
+                  <JFXTextField fx:id="name" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="38.0" prefHeight="25.0" prefWidth="165.0" promptText="Customer name" />
+                  <Label layoutX="16.0" layoutY="96.0" text="Phone number:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="phone" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="94.0" prefWidth="200.0" promptText="Customer phone number" />
-                  <Label layoutX="26.0" layoutY="159.0" text="Address:">
+                  <JFXTextField fx:id="phone" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="94.0" prefHeight="25.0" prefWidth="165.0" promptText="Customer phone number" />
+                  <Label layoutX="16.0" layoutY="159.0" text="Address:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="address" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="157.0" prefWidth="200.0" promptText="Customer address" />
-                  <Label layoutX="26.0" layoutY="220.0" text="E-mail:">
+                  <JFXTextField fx:id="address" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="157.0" prefHeight="25.0" prefWidth="165.0" promptText="Customer address" />
+                  <Label layoutX="16.0" layoutY="220.0" text="E-mail:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="email" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="218.0" prefWidth="200.0" promptText="Customer e-mail" />
-                  <Label layoutX="26.0" layoutY="282.0" text="Duration:">
+                  <JFXTextField fx:id="email" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="218.0" prefHeight="25.0" prefWidth="165.0" promptText="Customer e-mail" />
+                  <Label layoutX="16.0" layoutY="282.0" text="Duration:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="duration" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="280.0" prefWidth="200.0" promptText="Staying duration" />
-                  <Label layoutX="26.0" layoutY="348.0" text="How many people:">
+                  <JFXTextField fx:id="duration" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="280.0" prefHeight="25.0" prefWidth="165.0" promptText="Staying duration" />
+                  <Label layoutX="16.0" layoutY="348.0" text="How many people:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="26.0" layoutY="412.0" text="Payment type:">
+                  <Label layoutX="16.0" layoutY="412.0" text="Payment type:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXComboBox fx:id="num_people" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="346.0" prefHeight="25.0" prefWidth="200.0" promptText="How many people" />
-                  <JFXComboBox fx:id="paymentType" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="410.0" prefHeight="25.0" prefWidth="200.0" promptText="Payment type" />
+                  <JFXComboBox fx:id="num_people" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="346.0" prefHeight="25.0" prefWidth="165.0" promptText="How many people" />
+                  <JFXComboBox fx:id="paymentType" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="410.0" prefHeight="25.0" prefWidth="165.0" promptText="Payment type" />
                </children>
             </Pane>
-            <Pane layoutX="456.0" layoutY="96.0" opacity="0.8" prefHeight="475.0" prefWidth="384.0" style="-fx-background-color:white; -fx-background-radius:6px;">
+            <Pane layoutX="359.0" layoutY="96.0" opacity="0.8" prefHeight="186.0" prefWidth="328.0" style="-fx-background-color:white; -fx-background-radius:6px;">
                <children>
-                  <Label layoutX="26.0" layoutY="40.0" text="Room type:">
+                  <Label layoutX="16.0" layoutY="24.0" text="Start date:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="roomType" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="38.0" opacity="0.6" prefWidth="200.0" promptText="Room type" />
-                  <Label layoutX="26.0" layoutY="96.0" text="Room number:">
+                  <JFXDatePicker fx:id="startDate" defaultColor="#377ce8" editable="false" layoutX="148.0" layoutY="14.0" prefHeight="32.0" prefWidth="165.0" promptText="Start date" />
+                  <Label layoutX="16.0" layoutY="82.0" text="End date:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="roomNumber" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="94.0" prefWidth="200.0" promptText="Room number" />
-                  <Label layoutX="26.0" layoutY="159.0" text="Start date:">
+                  <JFXDatePicker fx:id="endDate" defaultColor="#377ce8" editable="false" layoutX="148.0" layoutY="72.0" prefHeight="32.0" prefWidth="165.0" promptText="End date" />
+                  <JFXButton buttonType="RAISED" layoutX="82.0" layoutY="132.0" onMouseClicked="#showRooms" prefHeight="30.0" prefWidth="165.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Show available rooms" textFill="WHITE">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </JFXButton>
+               </children>
+            </Pane>
+            <Pane layoutX="359.0" layoutY="293.0" opacity="0.8" prefHeight="278.0" prefWidth="328.0" style="-fx-background-color:white; -fx-background-radius:6px;">
+               <children>
+                  <Label layoutX="16.0" layoutY="16.0" text="Room number:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="26.0" layoutY="220.0" text="End date:">
+                  <JFXTextField fx:id="roomNumber" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="14.0" opacity="0.65" prefHeight="25.0" prefWidth="165.0" promptText="Room number" />
+                  <Label layoutX="16.0" layoutY="74.0" text="Room type:">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label layoutX="26.0" layoutY="282.0" text="Price ($):">
+                  <JFXTextField fx:id="roomType" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="72.0" opacity="0.65" prefHeight="25.0" prefWidth="165.0" promptText="Room type" />
+                  <Label layoutX="16.0" layoutY="125.0" text="Price ($):">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="price" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="280.0" opacity="0.6" prefWidth="200.0" promptText="Room price ($)" />
-                  <Label layoutX="26.0" layoutY="348.0" text="Discount:">
+                  <JFXTextField fx:id="price" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="122.0" opacity="0.65" prefHeight="25.0" prefWidth="165.0" promptText="Room price ($)" />
+                  <Label layoutX="16.0" layoutY="181.0" text="Discount (%):">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="discount" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="346.0" prefWidth="200.0" promptText="Discount (%)" />
-                  <Label layoutX="26.0" layoutY="412.0" text="Total price ($):">
+                  <JFXTextField fx:id="discount" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="178.0" prefHeight="25.0" prefWidth="165.0" promptText="Discount (%)" />
+                  <Label layoutX="16.0" layoutY="235.0" text="Total price ($):">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="total" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="158.0" layoutY="410.0" opacity="0.6" prefWidth="200.0" promptText="Total price ($)" />
-                  <JFXDatePicker fx:id="startDate" defaultColor="#377ce8" editable="false" layoutX="158.0" layoutY="153.0" prefHeight="28.0" prefWidth="200.0" promptText="Start date" />
-                  <JFXDatePicker fx:id="endDate" defaultColor="#377ce8" editable="false" layoutX="158.0" layoutY="214.0" prefHeight="28.0" prefWidth="200.0" promptText="End date" />
+                  <JFXTextField fx:id="total" editable="false" focusColor="#377ce8" labelFloat="true" layoutX="148.0" layoutY="233.0" opacity="0.65" prefHeight="25.0" prefWidth="165.0" promptText="Total price ($)" />
                </children>
             </Pane>
             <Pane layoutX="285.0" layoutY="592.0" opacity="0.8" prefHeight="101.0" prefWidth="796.0" style="-fx-background-color:white; -fx-background-radius:6px;">
                <children>
-                  <JFXButton buttonType="RAISED" layoutX="221.0" layoutY="31.0" onMouseClicked="#back" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="93.0" layoutY="31.0" onMouseClicked="#book" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Book" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="348.0" layoutY="31.0" onMouseClicked="#close" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="221.0" layoutY="31.0" onMouseClicked="#reset" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Reset" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="476.0" layoutY="31.0" onMouseClicked="#reset" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Reset" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="348.0" layoutY="31.0" onMouseClicked="#print" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Print" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="94.0" layoutY="31.0" onMouseClicked="#book" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Book" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="477.0" layoutY="31.0" onMouseClicked="#back" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="604.0" layoutY="31.0" onMouseClicked="#print" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Print" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="606.0" layoutY="31.0" onMouseClicked="#close" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -140,6 +150,16 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
+            <JFXTreeTableView fx:id="treeView" layoutX="698.0" layoutY="136.0" opacity="0.8" prefHeight="435.0" prefWidth="654.0" stylesheets="@hotel.css" />
+            <Pane layoutX="698.0" layoutY="96.0" opacity="0.5" prefHeight="32.0" prefWidth="654.0" style="-fx-background-color: white; -fx-background-radius: 6px;">
+               <children>
+                  <Label layoutX="221.0" prefHeight="32.0" prefWidth="212.0" text="Rooms available for chosen dates:" textAlignment="CENTER">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+               </children>
+            </Pane>
          </children>
       </AnchorPane>
    </children>
