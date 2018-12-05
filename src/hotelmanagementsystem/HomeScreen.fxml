@@ -47,7 +47,7 @@
                         <Image url="@../img/moje/Users-icon.png" />
                      </image>
                   </ImageView>
-                  <Label layoutX="50.0" layoutY="143.0" text="Customers Info" textFill="BLACK">
+                  <Label layoutX="34.0" layoutY="142.0" text="Customers Statistics" textFill="BLACK">
                      <font>
                         <Font name="System Bold" size="14.0" />
                      </font>

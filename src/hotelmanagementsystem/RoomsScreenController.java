@@ -73,6 +73,8 @@ public class RoomsScreenController implements Initializable {
     private JFXCheckBox available;
     @FXML
     private StackPane stackepane;
+    @FXML
+    private JFXCheckBox all;
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -238,15 +240,24 @@ public class RoomsScreenController implements Initializable {
     @FXML
     private void searchBusy(ActionEvent event) {
         available.setSelected(false);
+        all.setSelected(false);
         status = "SELECT * FROM room WHERE roomStatus = 'busy'";
     }
 
     @FXML
     private void searchAvailable(ActionEvent event) {
         busy.setSelected(false);
+        all.setSelected(false);
         status = "SELECT * FROM room WHERE roomStatus = 'available'";
     }
 
+    @FXML
+    private void searchAll(ActionEvent event) {
+        busy.setSelected(false);
+        available.setSelected(false);
+        status = "SELECT * FROM room";
+    }
+    
     @FXML
     private void goBack(MouseEvent event) {
         Stage home = new Stage();
@@ -333,4 +344,5 @@ public class RoomsScreenController implements Initializable {
         current.hide();
         addingRoom.show();
     }
+
 }

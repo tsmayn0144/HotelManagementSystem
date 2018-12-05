@@ -17,6 +17,21 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import com.mysql.jdbc.PreparedStatement;
+import java.awt.AWTException;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+import java.awt.print.PageFormat;
+import java.awt.print.Paper;
+import java.awt.print.Printable;
+import static java.awt.print.Printable.NO_SUCH_PAGE;
+import static java.awt.print.Printable.PAGE_EXISTS;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -42,12 +57,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+//import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
@@ -56,6 +72,18 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+import javax.print.Doc;
+import javax.print.DocFlavor;
+import javax.print.DocPrintJob;
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.SimpleDoc;
+import javax.print.attribute.AttributeSet;
+import javax.print.attribute.HashAttributeSet;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Destination;
+import javax.print.attribute.standard.PrinterName;
 import org.controlsfx.control.Notifications;
 
 /**
@@ -97,6 +125,8 @@ public class ReservationScreenController implements Initializable {
     private JFXTextField discount;
     @FXML
     private JFXTreeTableView<Room> treeView;
+    
+    public static int nrRec = 0;
     /**
      * Initializes the controller class.
      */
@@ -106,6 +136,7 @@ public class ReservationScreenController implements Initializable {
         initializeValues();
         addAllListeners();
         treeViewSelectionListener();
+        addValidation();
         
         //loadAvailableRooms("SELECT * FROM room");
     }
@@ -121,7 +152,8 @@ public class ReservationScreenController implements Initializable {
             } else {
                 root = FXMLLoader.load(getClass().getResource("HomeScreen.fxml"));
             }
-        } catch (IOException ex) {
+        } 
+        catch (IOException ex) {
             Logger.getLogger(AdminScreenController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -210,7 +242,8 @@ public class ReservationScreenController implements Initializable {
                 while (rs.next()) {
                     client_id = rs.getString(1);
                 }
-            } catch (SQLException ex) {
+            } 
+            catch (SQLException ex) {
                 Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
             }
             if (client_id == "") {
@@ -290,17 +323,52 @@ public class ReservationScreenController implements Initializable {
                 res = ps.executeUpdate();
 
                 if (res > 0) {
-                    clearForm();
+                    JFXDialogLayout dialogLayout = new JFXDialogLayout();
+                    dialogLayout.setHeading(new Text("Receipt"));
+                    dialogLayout.setBody(new Text("Do you want to print a receipt for that reservation?"));
+
+                    JFXButton yes = new JFXButton("Yes");
+                    JFXButton no = new JFXButton("No");
+
+                    JFXDialog dialog = new JFXDialog(stackepane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+
+                    yes.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            print();
+                            clearForm();
+                            dialog.close();
+                        }
+                    });
+
+                    no.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            clearForm();
+                            dialog.close();
+                        }
+                    });
+
+                    dialogLayout.setActions(yes, no);
+                    dialog.show();
                 }
-            } catch (SQLException ex) {
+            } 
+            catch (SQLException ex) {
                 Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
 
-    @FXML
-    private void print(MouseEvent event) { // puste na razie - do implementacji
+    private void print() { // puste na razie - do implementacji
+        PrinterJob pj = PrinterJob.getPrinterJob();        
+        pj.setPrintable(new BillPrint(), getPageFormat(pj));
 
+        try {
+            pj.print();
+        }
+        catch (PrinterException ex) {
+            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     private void updateStatus() {
@@ -642,5 +710,272 @@ public class ReservationScreenController implements Initializable {
         double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString()) / 100) * sum1);
         int sum = (int) sum2;
         total.setText(String.valueOf(sum));
+    }
+    
+    class BillPrint implements Printable { // klasa wewnętrzna
+        @Override
+        public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+            int result = NO_SUCH_PAGE;
+
+            if (pageIndex == 0) {
+                Graphics2D g2d = (Graphics2D) graphics;
+                double width = pageFormat.getImageableWidth();
+                g2d.translate((int) pageFormat.getImageableX(), (int) pageFormat.getImageableY());
+                FontMetrics metrics = g2d.getFontMetrics(new Font("Arial", Font.BOLD, 7));
+
+                int idLength = metrics.stringWidth("000");
+                int amtLength = metrics.stringWidth("000000");
+                int qtyLength = metrics.stringWidth("00000");
+                int priceLength = metrics.stringWidth("000000");
+                int prodLength = (int) width - idLength - amtLength - qtyLength - priceLength - 17;
+
+                int productPosition = 0;
+                int discountPosition = prodLength + 5;
+                int pricePosition = discountPosition + idLength + 10;
+                int qtyPosition = pricePosition + priceLength + 4;
+                int amtPosition = qtyPosition + qtyLength;
+
+                try {
+                    /*Draw Header*/
+                    int y = 20;
+                    int yShift = 10;
+                    int headerRectHeight = 15;
+                    int headerRectHeighta = 40;
+
+                    String user_name = name.getText();
+                    String add = address.getText();
+                    String phone_nr = phone.getText();
+                    String num = num_people.getValue();
+                    String dur = duration.getText();
+                    String roomnr = roomNumber.getText();
+                    String disc = discount.getText();
+                    String payment_type = paymentType.getValue();
+
+                    /*g2d.setFont(new Font("Monospaced", Font.PLAIN, 9));
+                    g2d.drawString("-------------------------------------", 12, y);
+                    y += yShift;
+                    g2d.drawString("         Hotel Bill Receipt          ", 12, y);
+                    y += yShift;
+                    g2d.drawString("-------------------------------------", 12, y);
+                    y += headerRectHeight;*/
+                    g2d.setFont(new Font("Monospaced", Font.PLAIN, 9));
+                    g2d.drawString("---------------------------------------------------------", 12, y);
+                    y += yShift;
+                    g2d.drawString("                    Hotel Bill Receipt                   ", 14, y);
+                    y += yShift;
+                    g2d.drawString("---------------------------------------------------------", 12, y);
+                    y += 35;
+
+                    g2d.drawString("---------------------------------------------------------", 12, y);
+                    y += headerRectHeight;
+                    g2d.drawString("  Name                 " + user_name + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Address              " + add + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Phone                " + phone_nr + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Number of people     " + num + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Duration             " + dur + " days ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Room number          " + roomnr + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Discount             " + disc + "%  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("  Payment type         " + payment_type + "  ", 12, y);
+                    y += yShift;
+                    g2d.drawString("---------------------------------------------------------", 12, y);
+                    y += yShift;
+                    g2d.drawString("                          Total price = " + total.getText().toString() + " ", 12, y);
+                    y += yShift;
+                    g2d.drawString("---------------------------------------------------------", 12, y);
+                    y += yShift;
+                    g2d.drawString("                   Hotel Phone Number                    ", 12, y);
+                    y += yShift;
+                    g2d.drawString("                       0123456789                        ", 12, y);
+                    y += yShift;
+                    g2d.drawString("*********************************************************", 12, y);
+                    y += yShift;
+                    g2d.drawString("            THANK YOU FOR VISITING OUR HOTEL             ", 12, y);
+                    y += yShift;
+                    g2d.drawString("*********************************************************", 12, y);
+                    y += yShift;
+                } 
+                catch (Exception r) {
+                    r.printStackTrace();
+                }
+                result = PAGE_EXISTS;
+            }
+            return result;
+        }
+    } // klasa wewnętrzna
+
+    public PageFormat getPageFormat(PrinterJob pj) {
+        PageFormat pf = pj.defaultPage();
+        Paper paper = pf.getPaper();
+
+        double middleHeight = 8.0;
+        double headerHeight = 2.0;
+        double footerHeight = 2.0;
+        double width = convert_CM_To_PPI(12); // dla drukarki trzeba przekonwertować na ppi
+        double height = convert_CM_To_PPI(headerHeight + middleHeight + footerHeight + 4);
+        paper.setSize(width, height);
+        paper.setImageableArea(0, 10, width, height - convert_CM_To_PPI(1));
+
+        pf.setOrientation(PageFormat.PORTRAIT);
+        pf.setPaper(paper);
+
+        return pf;
+    }
+
+    public static double convert_CM_To_PPI(double cm) {
+        return toPPI(cm * 0.393600787);
+    }
+
+    public static double toPPI(double inch) {
+        return inch * 72d; // domyślnie 72ppi
+    }
+    
+    private void addValidation() {
+        Robot r;
+        try {
+            r = new Robot();
+        
+            name.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!name.getText().matches("[A-Z][a-zA-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃ\\-\\s]{4,30}") && !name.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Name error");
+                            alert.setHeaderText("Full name must be 4 - 30 characters long (letters and '-' only) and begin with uppercase character.");
+                            alert.setContentText("Please enter correct name.");
+                            alert.showAndWait();
+
+                            name.setText("");
+
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            phone.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("\\+{0,1}[0-9]*")) ? change : null));
+            phone.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        //if (!phone.getText().matches("\\+{0,1}[0-9]{9,15}") && !phone.getText().equals("")) {  
+                        if (!phone.getText().matches(".{9,15}") && !phone.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Phone error");
+                            alert.setHeaderText("Phone must be 9 - 15 numbers long (optional + at the beginning).");
+                            alert.setContentText("Please enter correct phone number.");
+                            alert.showAndWait();
+
+                            phone.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            address.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!address.getText().matches("[a-zA-Z0-9\\.\\,\\-\\s/ęóąśłżźćńĘÓĄŚŁŻŹĆŃ]{5,50}") && !address.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Address error");
+                            alert.setHeaderText("Address must be 5 - 50 characters long (letters, numbers and .,-/ only).");
+                            alert.setContentText("Please enter correct address.");
+                            alert.showAndWait();
+
+                            address.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            email.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!email.getText().matches("[a-zA-Z0-9_\\.\\-]+@[a-zA-Z0-9]+\\.[a-z]{2,3}") && !email.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Email format error");
+                            alert.setHeaderText("Email must be 6 - 30 characters long (and contain @ and .xx suffix).");
+                            alert.setContentText("Please enter correct email.");
+                            alert.showAndWait();
+
+                            email.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            duration.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("[1-9]?[0-9]?")) ? change : null));
+            duration.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        //if ((!duration.getText().matches(".{1,2}") || duration.getText().matches("0[0-9]?"))&& !duration.getText().equals("")) {  
+                        if (duration.getText().matches("0[0-9]?") && !duration.getText().equals("")) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Duration error");
+                            alert.setHeaderText("Duration must be at least 1 day long.");
+                            alert.setContentText("Please enter correct duration.");
+                            alert.showAndWait();
+
+                            duration.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            discount.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("[0-9]?[0-9]?")) ? change : null));
+            discount.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (discount.getText().matches("0[0-9]?") && !discount.getText().equals("")) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Discount error");
+                            alert.setHeaderText("Discount must be a number between 0-99.");
+                            alert.setContentText("Please enter correct discount.");
+                            alert.showAndWait();
+
+                            discount.setText("0");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+        } 
+        catch (AWTException ex) {
+            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public static void pressShiftTab(Robot r) {
+        r.keyPress(KeyEvent.VK_SHIFT);
+        r.keyPress(KeyEvent.VK_TAB);
+        r.keyRelease(KeyEvent.VK_SHIFT);
+        r.keyRelease(KeyEvent.VK_TAB);
     }
 }

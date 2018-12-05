@@ -12,6 +12,9 @@ import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import com.mysql.jdbc.PreparedStatement;
+import static hotelmanagementsystem.ReservationScreenController.pressShiftTab;
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -19,6 +22,8 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,6 +35,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -72,36 +78,8 @@ public class NewRoomScreenController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        ObservableList ynList = FXCollections.observableArrayList();
-        ynList.add("yes");
-        ynList.add("no");
-        ac.setItems(ynList);
-        balcony.setItems(ynList);
-        
-        ObservableList roomTypeList = FXCollections.observableArrayList();
-        roomTypeList.add("A*");
-        roomTypeList.add("A");
-        roomTypeList.add("B*");
-        roomTypeList.add("B");
-        roomTypeList.add("C*");
-        roomTypeList.add("C");
-        roomType.setItems(roomTypeList);
-        
-        ObservableList numPeopleList = FXCollections.observableArrayList();
-        numPeopleList.add("1");
-        numPeopleList.add("2");
-        numPeopleList.add("3");
-        numPeopleList.add("4");
-        numPeopleList.add("5");
-        numPeopleList.add("6");
-        numPeopleList.add("7");
-        numPeopleList.add("8");
-        numPeople.setItems(numPeopleList);
-        
-        ac.setValue("");
-        balcony.setValue("");
-        roomType.setValue("");
-        numPeople.setValue("");
+        initializeValues();
+        addValidation();
     }    
 
    @FXML
@@ -228,5 +206,114 @@ public class NewRoomScreenController implements Initializable {
         balcony.setValue("");
         roomType.setValue("");
         numPeople.setValue("");
+    }
+
+    private void initializeValues() {
+        ObservableList ynList = FXCollections.observableArrayList();
+        ynList.add("yes");
+        ynList.add("no");
+        ac.setItems(ynList);
+        balcony.setItems(ynList);
+        
+        ObservableList roomTypeList = FXCollections.observableArrayList();
+        roomTypeList.add("A*");
+        roomTypeList.add("A");
+        roomTypeList.add("B*");
+        roomTypeList.add("B");
+        roomTypeList.add("C*");
+        roomTypeList.add("C");
+        roomType.setItems(roomTypeList);
+        
+        ObservableList numPeopleList = FXCollections.observableArrayList();
+        numPeopleList.add("1");
+        numPeopleList.add("2");
+        numPeopleList.add("3");
+        numPeopleList.add("4");
+        numPeopleList.add("5");
+        numPeopleList.add("6");
+        numPeopleList.add("7");
+        numPeopleList.add("8");
+        numPeople.setItems(numPeopleList);
+        
+        ac.setValue("");
+        balcony.setValue("");
+        roomType.setValue("");
+        numPeople.setValue("");
+    }
+    
+    private void addValidation() {
+        Robot r;
+        try {
+            r = new Robot();
+            
+            roomNumber.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("[1-9]?[0-9]?[0-9]?")) ? change : null));
+            roomNumber.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        //if ((!duration.getText().matches(".{1,2}") || duration.getText().matches("0[0-9]?"))&& !duration.getText().equals("")) {  
+                        if (roomNumber.getText().matches("0[0-9]?[0-9]?") && !roomNumber.getText().equals("")) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Room number error");
+                            alert.setHeaderText("Room number can not start with 0.");
+                            alert.setContentText("Please enter correct room number.");
+                            alert.showAndWait();
+
+                            roomNumber.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+            
+            roomPhone.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("[0-9]*")) ? change : null));
+            roomPhone.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!roomPhone.getText().matches(".{4,8}") && !roomPhone.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Phone error");
+                            alert.setHeaderText("Room phone number must be 4-8 numbers long.");
+                            alert.setContentText("Please enter correct room phone number.");
+                            alert.showAndWait();
+
+                            roomPhone.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+            
+            roomPrice.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("[1-9]?[0-9]?[0-9]?[0-9]?")) ? change : null));
+            roomPrice.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        //if ((!duration.getText().matches(".{1,2}") || duration.getText().matches("0[0-9]?"))&& !duration.getText().equals("")) {  
+                        if (roomPrice.getText().matches("0[0-9]?[0-9]?[0-9]?") && !roomPrice.getText().equals("")) {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Room price error");
+                            alert.setHeaderText("Room price can not start with 0.");
+                            alert.setContentText("Please enter correct room price.");
+                            alert.showAndWait();
+
+                            roomPrice.setText("");
+                            
+                            pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+        }
+        catch (AWTException ex) {
+            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 }

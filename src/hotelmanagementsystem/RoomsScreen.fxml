@@ -38,12 +38,12 @@
                   </Pane>
                   <Pane layoutX="20.0" layoutY="293.0" prefHeight="127.0" prefWidth="379.0" style="-fx-border-radius: 15; -fx-border-color: #ccc; -fx-border-width: 2 px;">
                      <children>
-                        <JFXCheckBox fx:id="busy" checkedColor="#377ce8" layoutX="74.0" layoutY="31.0" onAction="#searchBusy" text="Busy">
+                        <JFXCheckBox fx:id="busy" checkedColor="#377ce8" layoutX="57.0" layoutY="31.0" onAction="#searchBusy" text="Busy">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </JFXCheckBox>
-                        <JFXCheckBox fx:id="available" checkedColor="#377ce8" layoutX="229.0" layoutY="31.0" onAction="#searchAvailable" text="Available">
+                        <JFXCheckBox fx:id="available" checkedColor="#377ce8" layoutX="149.0" layoutY="31.0" onAction="#searchAvailable" text="Available">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -53,6 +53,11 @@
                               <Font size="14.0" />
                            </font>
                         </JFXButton>
+                        <JFXCheckBox fx:id="all" checkedColor="#377ce8" layoutX="270.0" layoutY="31.0" onAction="#searchAll" text="All">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </JFXCheckBox>
                      </children>
                   </Pane>
                   <Pane layoutX="20.0" layoutY="501.0" prefHeight="127.0" prefWidth="379.0" style="-fx-border-radius: 15; -fx-border-color: #ccc; -fx-border-width: 2 px;">
@@ -74,12 +79,12 @@
                         </JFXButton>
                      </children>
                   </Pane>
-                  <Label layoutX="102.0" layoutY="48.0" text="You can find a room by room number &#10;               and make it available">
+                  <Label layoutX="102.0" layoutY="48.0" text="You can find a room by room number &#10;and make it available" textAlignment="CENTER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label layoutX="97.0" layoutY="250.0" text="You can search busy or available rooms &#10;        by clicking appropriate button">
+                  <Label layoutX="97.0" layoutY="250.0" text="You can search busy, available or all rooms &#10;by clicking appropriate button" textAlignment="CENTER">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>

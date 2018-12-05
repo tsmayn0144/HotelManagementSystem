@@ -54,7 +54,7 @@ public class HotelManagementSystem extends Application {
     }
 
     private void updateRoomStatusAvailable() {
-        System.out.println("test 2");
+        //System.out.println("test 2");
         int res2 = 0;
         
         String check_rooms_to_make_available = "SELECT room.roomNumber FROM room, reservation "
@@ -107,7 +107,7 @@ public class HotelManagementSystem extends Application {
     }
     
     private void updateRoomStatusBusy() {
-        System.out.println("test1");
+        //System.out.println("test1");
         int res1 = 0;
 
         String check_rooms_to_make_busy = "SELECT room.roomNumber FROM room, reservation "

@@ -5,6 +5,9 @@
  */
 package hotelmanagementsystem;
 
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
@@ -22,6 +25,7 @@ import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -33,6 +37,8 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
@@ -53,6 +59,8 @@ public class CustomersScreenController implements Initializable {
 
     @FXML
     private JFXTextField searchText;
+    @FXML
+    private StackPane stackepane;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -251,5 +259,34 @@ public class CustomersScreenController implements Initializable {
                 }
             }
         });
+    }
+
+    @FXML
+    private void close(MouseEvent event) {
+        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+        dialogLayout.setHeading(new Text("Close"));
+        dialogLayout.setBody(new Text("Do you want to exit?"));
+        
+        JFXButton ok = new JFXButton("Ok");
+        JFXButton cancel = new JFXButton("Cancel");
+        
+        JFXDialog dialog = new JFXDialog(stackepane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+        
+        ok.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.exit(0);
+            }
+        });
+        
+        cancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                dialog.close();
+            }
+        });
+        
+        dialogLayout.setActions(ok, cancel);
+        dialog.show();
     }
 }

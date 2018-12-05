@@ -118,27 +118,22 @@
             </Pane>
             <Pane layoutX="285.0" layoutY="592.0" opacity="0.8" prefHeight="101.0" prefWidth="796.0" style="-fx-background-color:white; -fx-background-radius:6px;">
                <children>
-                  <JFXButton buttonType="RAISED" layoutX="93.0" layoutY="31.0" onMouseClicked="#book" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Book" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="123.0" layoutY="31.0" onMouseClicked="#book" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Book" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="221.0" layoutY="31.0" onMouseClicked="#reset" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Reset" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="274.0" layoutY="31.0" onMouseClicked="#reset" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Reset" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="348.0" layoutY="31.0" onMouseClicked="#print" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Print" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="424.0" layoutY="31.0" onMouseClicked="#back" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="477.0" layoutY="31.0" onMouseClicked="#back" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Back" textFill="WHITE">
-                     <font>
-                        <Font size="14.0" />
-                     </font>
-                  </JFXButton>
-                  <JFXButton buttonType="RAISED" layoutX="606.0" layoutY="31.0" onMouseClicked="#close" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
+                  <JFXButton buttonType="RAISED" layoutX="576.0" layoutY="31.0" onMouseClicked="#close" prefHeight="40.0" prefWidth="100.0" ripplerFill="WHITE" style="-fx-background-color: #377ce8;" text="Close" textFill="WHITE">
                      <font>
                         <Font size="14.0" />
                      </font>

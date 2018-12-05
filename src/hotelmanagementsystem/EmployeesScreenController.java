@@ -16,6 +16,8 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import com.mysql.jdbc.PreparedStatement;
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
@@ -23,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ResourceBundle;
+import java.util.function.UnaryOperator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.InvalidationListener;
@@ -40,6 +43,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
@@ -94,6 +98,7 @@ public class EmployeesScreenController implements Initializable {
         // TODO
         initializeData();
         treeViewSelectionListener();
+        addValidation();
 
         loadAllEmployees("SELECT * FROM users");
     }    
@@ -485,5 +490,120 @@ public class EmployeesScreenController implements Initializable {
         userType.setItems(userTypeList);
         
         //userType.setValue("");
+    }
+    
+    private void addValidation() {
+        Robot r;
+        try {
+            r = new Robot();
+            
+            search_text.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("([a-zA-Z\\s]*)?")) ? change : null));
+
+            username.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!username.getText().matches("([a-zA-Z0-9]){6,15}") && !username.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Username error");
+                            alert.setHeaderText("Username must be 6 - 15 characters long (letters and numbers only).");
+                            alert.setContentText("Please enter correct username.");
+                            alert.showAndWait();
+
+                            username.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            password.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!password.getText().matches("(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*_\\-+=.])(?=\\S+$).{6,15}") && !password.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Password error");
+                            alert.setHeaderText("Password must be 6 - 15 characters long (no whitespaces, at least 1 special character).");
+                            alert.setContentText("Please enter correct password.");
+                            alert.showAndWait();
+
+                            password.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            fullName.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!fullName.getText().matches("[A-Z][a-zA-ZęóąśłżźćńĘÓĄŚŁŻŹĆŃ\\-\\s]{3,30}") && !fullName.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Name error");
+                            alert.setHeaderText("Full name must be 4 - 30 characters long (letters and '-' only) and begin with uppercase character.");
+                            alert.setContentText("Please enter correct full name.");
+                            alert.showAndWait();
+
+                            fullName.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            address.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!address.getText().matches("[a-zA-Z0-9\\.\\,\\-\\s/ęóąśłżźćńĘÓĄŚŁŻŹĆŃ]{5,50}") && !address.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Address error");
+                            alert.setHeaderText("Address must be 5 - 50 characters long (letters, numbers and .,-/ only).");
+                            alert.setContentText("Please enter correct address.");
+                            alert.showAndWait();
+
+                            address.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+
+            phone.setTextFormatter(new TextFormatter<>(change
+                    -> (change.getControlNewText().matches("\\+{0,1}[0-9]*")) ? change : null));
+            phone.focusedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
+                        if (!phone.getText().matches(".{9,15}") && !phone.getText().equals("")) {
+
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Phone error");
+                            alert.setHeaderText("Phone must be 9 - 15 numbers long (optional + at the beginning).");
+                            alert.setContentText("Please enter correct phone number.");
+                            alert.showAndWait();
+
+                            phone.setText("");
+                            
+                            ReservationScreenController.pressShiftTab(r);
+                        }
+                    }
+                }
+            });
+        }
+        catch (AWTException ex) {
+            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 }
