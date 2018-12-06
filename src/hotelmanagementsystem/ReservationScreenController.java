@@ -6,6 +6,7 @@
 package hotelmanagementsystem;
 
 import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.JFXDialog;
@@ -40,7 +41,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,9 +60,13 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableRow;
+import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -125,8 +132,15 @@ public class ReservationScreenController implements Initializable {
     private JFXTextField discount;
     @FXML
     private JFXTreeTableView<Room> treeView;
+    @FXML
+    private JFXButton countButton;
     
     public static int nrRec = 0;
+    private boolean isCounted = false;
+    private List<Room> selectedRooms = new ArrayList<>();
+    private static int selectedCounter = 0;
+    private static int roomCapacityCounter = 0;
+
     /**
      * Initializes the controller class.
      */
@@ -198,164 +212,183 @@ public class ReservationScreenController implements Initializable {
 
     @FXML
     private void reset(MouseEvent event) {
-        clearForm();
+        clearForm(); 
+        countButton.setDisable(true);
     }
 
     @FXML
     private void book(MouseEvent event) {
-        int res1 = 0;
-        String sql1 = "INSERT INTO customer (name, email, address, phone) VALUES (?, ?, ?, ?)";
-        Connection connection = DBConnection.getConnection();
+        if(isCounted){
+            //List<Room> selected = treeViewSelectionListener();
+        
+            int res1 = 0;
+            String sql1 = "INSERT INTO customer (name, email, address, phone) VALUES (?, ?, ?, ?)";
+            Connection connection = DBConnection.getConnection();
 
-        if (!checkEmptyFields()) {
-            //////////////////////// CUSTOMER ///////////////////////
-            try {
-                PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql1);
-                ps.setString(1, name.getText().toString());
-                ps.setString(2, email.getText().toString());
-                ps.setString(3, address.getText().toString());
-                ps.setString(4, phone.getText().toString());
+            if (!checkEmptyFields()) {
+                //////////////////////// CUSTOMER ///////////////////////
 
-                res1 = ps.executeUpdate();
-            } 
-            catch (SQLException ex) {
-                Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                try {
+                    PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql1);
+                    ps.setString(1, name.getText().toString());
+                    ps.setString(2, email.getText().toString());
+                    ps.setString(3, address.getText().toString());
+                    ps.setString(4, phone.getText().toString());
 
-            if (res1 == 0) {
-                Image image = new Image("img/delete.png");
-                Notifications notification = Notifications.create().title("Error").text("Something went wrong (unable to add records to 'customer' table).")
-                        .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
-                notification.darkStyle();
-                notification.show();
-            }
-
-            //////// clientId
-            
-            String client_id = ""; // zczytywanie z bazy clientId w celu dodania go do tabeli reservation
-            String sql2 = "SELECT max(id) FROM customer";
-            
-            try {
-                PreparedStatement ps2 = (PreparedStatement) connection.prepareStatement(sql2);
-                ResultSet rs = ps2.executeQuery();
-
-                while (rs.next()) {
-                    client_id = rs.getString(1);
+                    res1 = ps.executeUpdate();
+                } catch (SQLException ex) {
+                    Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } 
-            catch (SQLException ex) {
-                Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (client_id == "") {
-                Image image = new Image("img/delete.png");
-                Notifications notification = Notifications.create().title("Error").text("Something went wrong (unable to read clientId).")
-                        .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
-                notification.darkStyle();
-                notification.show();
-            }
 
-            ////////////////////// RESERVATION //////////////////////
-            int res3 = 0;
-            String sql3 = "INSERT INTO reservation (clientId, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-            try {
-                PreparedStatement ps3 = (PreparedStatement) connection.prepareStatement(sql3);
-
-                ps3.setString(1, client_id);
-                ps3.setString(2, roomNumber.getText().toString());
-                ps3.setString(3, duration.getText().toString());
-                ps3.setString(4, startDate.getValue().toString());
-                ps3.setString(5, endDate.getValue().toString());
-                ps3.setString(6, num_people.getValue().toString());
-                ps3.setString(7, paymentType.getValue().toString());
-                ps3.setString(8, discount.getText().toString());
-                ps3.setString(9, total.getText().toString());
-
-                res3 = ps3.executeUpdate();
-            } 
-            catch (SQLException ex) {
-                Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            if (res1 > 0 && res3 > 0) {
-                Image image = new Image("img/mooo.png");
-                Notifications notification = Notifications.create().title("Done").text("Reservation submitted successfully")
-                        .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
-                notification.darkStyle();
-                notification.show();
-                if (startDate.getValue().toString().equals(LocalDate.now().toString())) {
-                    System.out.println(startDate.getValue().toString());
-                    System.out.println(LocalDate.now().toString());
-                    updateStatus();
+                if (res1 == 0) {
+                    Image image = new Image("img/delete.png");
+                    Notifications notification = Notifications.create().title("Error").text("Something went wrong (unable to add records to 'customer' table).")
+                            .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
+                    notification.darkStyle();
+                    notification.show();
                 }
-            } 
-            else {
+
+                //////// clientId
+                String client_id = ""; // zczytywanie z bazy clientId w celu dodania go do tabeli reservation
+                String sql2 = "SELECT max(id) FROM customer";
+
+                try {
+                    PreparedStatement ps2 = (PreparedStatement) connection.prepareStatement(sql2);
+                    ResultSet rs = ps2.executeQuery();
+
+                    while (rs.next()) {
+                        client_id = rs.getString(1);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                if (client_id == "") {
+                    Image image = new Image("img/delete.png");
+                    Notifications notification = Notifications.create().title("Error").text("Something went wrong (unable to read clientId).")
+                            .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
+                    notification.darkStyle();
+                    notification.show();
+                }
+
+                ////////////////////// RESERVATION //////////////////////
+                int res3 = 0;
+                String sql3 = "INSERT INTO reservation (clientId, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+                try {
+                    PreparedStatement ps3 = (PreparedStatement) connection.prepareStatement(sql3);
+
+                    for (Room room : selectedRooms) {
+                        ps3.setString(1, client_id);
+                        ps3.setString(2, room.getRoomNumber().getValue().toString());
+                        ps3.setString(3, duration.getText().toString());
+                        ps3.setString(4, startDate.getValue().toString());
+                        ps3.setString(5, endDate.getValue().toString());
+                        ps3.setString(6, num_people.getValue().toString());
+                        ps3.setString(7, paymentType.getValue().toString());
+                        ps3.setString(8, discount.getText().toString());
+                        ps3.setString(9, total.getText().toString());
+
+                        res3 += ps3.executeUpdate();
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                if (res1 > 0 && res3 == selectedRooms.size()) {
+                    Image image = new Image("img/mooo.png");
+                    Notifications notification = Notifications.create().title("Done").text("Reservation(s) submitted successfully")
+                            .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
+                    notification.darkStyle();
+                    notification.show();
+                    if (startDate.getValue().toString().equals(LocalDate.now().toString())) {
+                        System.out.println(startDate.getValue().toString());
+                        System.out.println(LocalDate.now().toString());
+                        updateStatus(selectedRooms);
+                    }
+                }
+                /*else {
                 Image image = new Image("img/delete.png");
                 Notifications notification = Notifications.create().title("Error").text("Something went wrong (unable to add records to 'reservation' table).")
                         .hideAfter(Duration.seconds(3)).position(Pos.BOTTOM_LEFT).graphic(new ImageView(image));
                 notification.darkStyle();
                 notification.show();
-            }
+            }*/
 
-            //////////////////// CUSTOMER_RESERVATION_DATA //////////////////////////////////
-            int res = 0;
-            String sql = "INSERT INTO customerreservationdata (clientId, name, email, address, phone, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                //////////////////// CUSTOMER_RESERVATION_DATA //////////////////////////////////
+                int res = 0;
+                String sql = "INSERT INTO customerreservationdata (clientId, name, email, address, phone, roomNumber, duration, startDate, endDate, numOfPeople, paymentType, discountPercent, total) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            try {
-                PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
+                try {
+                    PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
 
-                ps.setString(1, client_id);
-                ps.setString(2, name.getText().toString());
-                ps.setString(3, email.getText().toString());
-                ps.setString(4, address.getText().toString());
-                ps.setString(5, phone.getText().toString());
-                ps.setString(6, roomNumber.getText().toString());
-                ps.setString(7, duration.getText().toString());
-                ps.setString(8, startDate.getValue().toString());
-                ps.setString(9, endDate.getValue().toString());
-                ps.setString(10, num_people.getValue().toString());
-                ps.setString(11, paymentType.getValue().toString());
-                ps.setString(12, discount.getText().toString());
-                ps.setString(13, total.getText().toString());
+                    for (Room room : selectedRooms) {
+                        ps.setString(1, client_id);
+                        ps.setString(2, name.getText().toString());
+                        ps.setString(3, email.getText().toString());
+                        ps.setString(4, address.getText().toString());
+                        ps.setString(5, phone.getText().toString());
+                        ps.setString(6, room.getRoomNumber().getValue().toString());
+                        ps.setString(7, duration.getText().toString());
+                        ps.setString(8, startDate.getValue().toString());
+                        ps.setString(9, endDate.getValue().toString());
+                        ps.setString(10, num_people.getValue().toString());
+                        ps.setString(11, paymentType.getValue().toString());
+                        ps.setString(12, discount.getText().toString());
+                        ps.setString(13, total.getText().toString());
 
-                res = ps.executeUpdate();
+                        res += ps.executeUpdate();
+                    }
 
-                if (res > 0) {
-                    JFXDialogLayout dialogLayout = new JFXDialogLayout();
-                    dialogLayout.setHeading(new Text("Receipt"));
-                    dialogLayout.setBody(new Text("Do you want to print a receipt for that reservation?"));
+                    if (res == selectedRooms.size()) {
+                        JFXDialogLayout dialogLayout = new JFXDialogLayout();
+                        dialogLayout.setHeading(new Text("Receipt"));
+                        dialogLayout.setBody(new Text("Do you want to print a receipt for that reservation?"));
 
-                    JFXButton yes = new JFXButton("Yes");
-                    JFXButton no = new JFXButton("No");
+                        JFXButton yes = new JFXButton("Yes");
+                        JFXButton no = new JFXButton("No");
 
-                    JFXDialog dialog = new JFXDialog(stackepane, dialogLayout, JFXDialog.DialogTransition.CENTER);
+                        JFXDialog dialog = new JFXDialog(stackepane, dialogLayout, JFXDialog.DialogTransition.CENTER);
 
-                    yes.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            print();
-                            clearForm();
-                            dialog.close();
-                        }
-                    });
+                        yes.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                print();
+                                clearForm();
+                                dialog.close();
+                            }
+                        });
 
-                    no.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                            clearForm();
-                            dialog.close();
-                        }
-                    });
+                        no.setOnAction(new EventHandler<ActionEvent>() {
+                            @Override
+                            public void handle(ActionEvent event) {
+                                clearForm();
+                                dialog.close();
+                            }
+                        });
 
-                    dialogLayout.setActions(yes, no);
-                    dialog.show();
+                        dialogLayout.setActions(yes, no);
+                        dialog.show();
+                    }
+                } 
+                catch (SQLException ex) {
+                    Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            } 
-            catch (SQLException ex) {
-                Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
             }
+            selectedRooms.clear();
+            selectedCounter = 0;
+            roomCapacityCounter = 0;
+            treeView.getSelectionModel().clearSelection();
+            countButton.setDisable(true);
+            isCounted = false;
+        }
+        else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Error");
+            alert.setHeaderText("Unable to book rooms without counting total price first.");
+            alert.setContentText("Please count the total price and try again.");
+            alert.showAndWait();
         }
     }
 
@@ -371,27 +404,30 @@ public class ReservationScreenController implements Initializable {
         }
     }
 
-    private void updateStatus() {
-        String text = roomNumber.getText().toString().trim();
-        String sql = "UPDATE room SET roomStatus=? WHERE roomNumber=?";
-        Connection connection = DBConnection.getConnection();
+    private void updateStatus(List<Room> list) {
+        for (Room room : list) {
+            String text = room.getRoomNumber().getValue().toString();
+            String sql = "UPDATE room SET roomStatus=? WHERE roomNumber=?";
+            Connection connection = DBConnection.getConnection();
 
-        try {
-            PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
-            ps.setString(1, "busy");
-            ps.setString(2, text);
+            try {
+                PreparedStatement ps = (PreparedStatement) connection.prepareStatement(sql);
+                ps.setString(1, "busy");
+                ps.setString(2, text);
 
-            ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+                ps.executeUpdate();
+            } 
+            catch (SQLException ex) {
+                Logger.getLogger(ReservationScreenController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 
     private boolean checkEmptyFields() {
         if (name.getText().toString().equals("") || email.getText().toString().equals("") || address.getText().toString().equals("")
                 || phone.getText().toString().equals("") || num_people.getValue().toString().equals("") || paymentType.getValue().toString().equals("")
-                || duration.getText().toString().equals("") || roomType.getText().toString().equals("") || roomNumber.getText().toString().equals("")
-                || startDate.getValue().toString().equals("") || endDate.getValue().toString().equals("") || price.getText().toString().equals("")
+                || duration.getText().toString().equals("") || roomNumber.getText().toString().equals("")
+                || startDate.getValue().toString().equals("") || endDate.getValue().toString().equals("")
                 || discount.getText().toString().equals("") || total.getText().toString().equals("")) {
 
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -422,6 +458,8 @@ public class ReservationScreenController implements Initializable {
         total.setText("");
         startDate.setValue(LocalDate.now());
         endDate.setValue(LocalDate.now().plusDays(1));
+        
+        selectedRooms.clear();
     }
 
     private void addAllListeners() {
@@ -430,10 +468,22 @@ public class ReservationScreenController implements Initializable {
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (!newValue) {
                     endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
+                    
+                    roomNumber.setText(" ");
+                    roomType.setText("");
+                    price.setText("");
+                    total.setText("");
+
+                    countButton.setDisable(true);
+                    selectedRooms.clear();
+                    selectedCounter = 0;
+                    roomCapacityCounter = 0;
+                    isCounted = false;
+                    treeView.getSelectionModel().clearSelection();
                 }
                 /////////////////////////
                 if (!newValue && !price.getText().equals("") && !discount.getText().equals("")) {
-                    countTotal();
+                    //countTotal(selectedRooms);
                 }
             }
         });
@@ -451,7 +501,6 @@ public class ReservationScreenController implements Initializable {
                         startDate.setValue(LocalDate.now());
                     }
                     else {
-                        //if (startDate.getValue().isAfter(endDate.getValue()) && duration.getText().toString().equals("")) {
                         if (duration.getText().toString().equals("")) {
                             endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(1));
                         } 
@@ -459,6 +508,17 @@ public class ReservationScreenController implements Initializable {
                             endDate.setValue(LocalDate.from(startDate.getValue()).plusDays(Long.parseLong(duration.getText().toString())));
                         }
                     }
+                    roomNumber.setText(" ");
+                    roomType.setText("");
+                    price.setText("");
+                    total.setText("");
+
+                    countButton.setDisable(true);
+                    selectedRooms.clear();
+                    selectedCounter = 0;
+                    roomCapacityCounter = 0;
+                    isCounted = false;
+                    treeView.getSelectionModel().clearSelection();
                 }
             }
         });
@@ -467,7 +527,6 @@ public class ReservationScreenController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
                 if (!newValue) {
-                    //if (endDate.getValue().isBefore(startDate.getValue()) && duration.getText().toString().equals("")) {
                     if (startDate.getValue().isAfter(endDate.getValue())) {
                         Alert alert = new Alert(Alert.AlertType.WARNING);
                         alert.setTitle("Date error");
@@ -487,6 +546,17 @@ public class ReservationScreenController implements Initializable {
                         int diff = period.getDays();
                         duration.setText(String.valueOf(diff));
                     }
+                    roomNumber.setText(" ");
+                    roomType.setText("");
+                    price.setText("");
+                    total.setText("");
+
+                    countButton.setDisable(true);
+                    selectedRooms.clear();
+                    selectedCounter = 0;
+                    roomCapacityCounter = 0;
+                    isCounted = false;
+                    treeView.getSelectionModel().clearSelection();
                 }
             }
         });
@@ -519,7 +589,7 @@ public class ReservationScreenController implements Initializable {
                 }
                 //////////////////////////////
                 if (!newValue && !duration.getText().equals("") && !price.getText().equals("") && !discount.getText().equals("")) {
-                    countTotal();
+                    countTotal(selectedRooms);
                 }
             }
         });
@@ -527,8 +597,36 @@ public class ReservationScreenController implements Initializable {
         discount.focusedProperty().addListener(new ChangeListener<Boolean>() {
             @Override
             public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                if (!newValue && !duration.getText().equals("") && !price.getText().equals("")) {
-                    countTotal();
+                if (!newValue) {
+                    countTotal(selectedRooms);
+                }
+            }
+        });
+        
+        num_people.focusedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                //if (!newValue && !duration.getText().equals("") && !price.getText().equals("")) {
+                if (!newValue) {
+                    //countTotal(selectedRooms);
+                    if (selectedCounter >= Integer.parseInt(num_people.getValue().toString())) {
+                        Alert alert = new Alert(Alert.AlertType.WARNING);
+                        alert.setTitle("Selection warning");
+                        alert.setHeaderText("You can not choose more rooms than people.");
+                        alert.setContentText("Make sure to choose correct number of people and rooms and try again.");
+                        alert.showAndWait();
+
+                        roomNumber.setText(" ");
+                        roomType.setText("");
+                        price.setText("");
+                        total.setText("");
+                        
+                        selectedRooms.clear();
+                        selectedCounter = 0;
+                        roomCapacityCounter = 0;
+                        isCounted = false;
+                        treeView.getSelectionModel().clearSelection();
+                    } 
                 }
             }
         });
@@ -540,6 +638,9 @@ public class ReservationScreenController implements Initializable {
         endDate.setValue(LocalDate.now().plusDays(1));
         num_people.setValue("");
         paymentType.setValue("");
+        roomNumber.setText(" ");
+        
+        countButton.setDisable(true);
         
         DateFormatting.dateFormatter(startDate);
         DateFormatting.dateFormatter(endDate);
@@ -561,6 +662,8 @@ public class ReservationScreenController implements Initializable {
         paymentTypeList.add("paypal");
         paymentTypeList.add("transfer");
         paymentType.setItems(paymentTypeList);
+        
+        treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
     
     private void loadAvailableRooms(String sql) {
@@ -642,15 +745,15 @@ public class ReservationScreenController implements Initializable {
         try {
             PreparedStatement ps = (PreparedStatement)connection.prepareStatement(sql);
             
-            ps.setString(1, num_people.getValue().toString());
-            ps.setString(2, startDate.getValue().toString());
-            ps.setString(3, endDate.getValue().toString());
-            ps.setString(4, startDate.getValue().toString());
-            ps.setString(5, endDate.getValue().toString());
+            //ps.setString(1, num_people.getValue().toString());
+            ps.setString(1, startDate.getValue().toString());
+            ps.setString(2, endDate.getValue().toString());
+            ps.setString(3, startDate.getValue().toString());
+            ps.setString(4, endDate.getValue().toString());
+            ps.setString(5, startDate.getValue().toString());
             ps.setString(6, startDate.getValue().toString());
-            ps.setString(7, startDate.getValue().toString());
+            ps.setString(7, endDate.getValue().toString());
             ps.setString(8, endDate.getValue().toString());
-            ps.setString(9, endDate.getValue().toString());
             //ps.setString(10, startDate.getValue().toString());
             
             ResultSet rs = ps.executeQuery();
@@ -670,16 +773,81 @@ public class ReservationScreenController implements Initializable {
     }
     
     private void treeViewSelectionListener() {
-        treeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Room>>() {
-            @Override
-            public void changed(ObservableValue<? extends TreeItem<Room>> observable, TreeItem<Room> oldValue, TreeItem<Room> newValue) {
-                roomNumber.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomNumber().getValueSafe()));
-                roomType.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomType().getValueSafe()));
-                price.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomPrice().getValueSafe()));
+
+        /*for (int i = 0; i < treeView.getSelectionModel().getSelectedItems().size(); i++) {
+            selectedRooms.add(treeView.getSelectionModel().getSelectedItems().get());
+            System.out.println();
+        }
+
+        //selectedRooms.add(treeView.getSelectionModel().getSelectedItems().);
+        return selectedRooms;*/
+
+        /*if (num_people.getValue().equals(String.valueOf(treeView.getSelectionModel().getSelectedItems().size()-1))) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Selection error");
+            alert.setHeaderText("You can not choose more rooms than people.");
+            alert.setContentText("Make sure to choose correct number of people and try again.");
+            alert.showAndWait();
+
+            treeView.getSelectionModel().clearSelection();
+        }*/
+        
+       /* if (treeView.getSelectionModel().getSelectedItems().size() == 1) {
+            roomNumber.setDisable(false);
+            roomType.setDisable(false);
+            price.setDisable(false);*/
             
-                countTotal();
-            } 
-        });
+            treeView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<Room>>() {
+                @Override
+                public void changed(ObservableValue<? extends TreeItem<Room>> observable, TreeItem<Room> oldValue, TreeItem<Room> newValue) {
+                    //roomNumber.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomNumber().getValueSafe()));
+                    roomType.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomType().getValueSafe()));
+                    price.setText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomPrice().getValueSafe()));
+
+                    if (selectedRooms.contains(treeView.getSelectionModel().getSelectedItem().getValue())) {
+                        selectedRooms.remove(treeView.getSelectionModel().getSelectedItem().getValue());
+                        String nr = " " + String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomNumber().getValueSafe()) + " ";
+                        String str = roomNumber.getText();
+                        String strNew = str.replace(nr, " ");
+                        roomNumber.setText(strNew);
+                        roomType.setText("");
+                        price.setText("");
+                        
+                        if (selectedCounter > 0)
+                            selectedCounter--;
+                        if (roomCapacityCounter > 0)
+                            roomCapacityCounter -= Integer.parseInt(treeView.getSelectionModel().getSelectedItem().getValue().getNumberOfPeople().getValue());
+                        treeView.getSelectionModel().clearSelection(treeView.getSelectionModel().getSelectedIndex());
+                    }
+                    else {
+                        if (selectedCounter < Integer.parseInt(num_people.getValue().toString())) {
+                            selectedRooms.add(treeView.getSelectionModel().getSelectedItem().getValue());
+                            roomNumber.appendText(String.valueOf(treeView.getSelectionModel().getSelectedItem().getValue().getRoomNumber().getValueSafe()) + " ");
+                            selectedCounter++;
+                            roomCapacityCounter += Integer.parseInt(treeView.getSelectionModel().getSelectedItem().getValue().getNumberOfPeople().getValue());
+                        }
+                        else {
+                            Alert alert = new Alert(Alert.AlertType.WARNING);
+                            alert.setTitle("Selection warning");
+                            alert.setHeaderText("You can not choose more rooms than people.");
+                            alert.setContentText("Make sure to choose correct number of people and rooms and then try again.");
+                            alert.showAndWait();
+                            
+                            roomType.setText("");
+                            price.setText("");
+                        }
+                    }
+                }
+            });
+       
+        /*if (treeView.getSelectionModel().getSelectedItems().size() > 1) {
+            for (Room room : selectedRooms) {
+                selectedRooms.add(room);
+            }
+            //selectedRooms.add(treeView.getSelectionModel().getSelectedItems());
+        }*/
+        
+        //return selectedRooms;
     }
 
     @FXML
@@ -696,7 +864,19 @@ public class ReservationScreenController implements Initializable {
             alert.showAndWait();
         }
         else {
-            loadAvailableRooms("SELECT * FROM room WHERE room.numberOfPeople>=? AND room.roomNumber NOT IN "
+            countButton.setDisable(false);
+            
+            roomNumber.setText(" ");
+            roomType.setText("");
+            price.setText("");
+            total.setText("");
+            selectedRooms.clear();
+            selectedCounter = 0;
+            roomCapacityCounter = 0;
+            isCounted = false;
+            treeView.getSelectionModel().clearSelection();
+            
+            loadAvailableRooms("SELECT * FROM room WHERE room.roomNumber NOT IN "
                 + "(SELECT room.roomNumber FROM reservation, room WHERE reservation.roomNumber=room.roomNumber AND "
                 + "(((reservation.startDate >= ? AND reservation.startDate < ?) OR "
                 + "(reservation.endDate > ? AND reservation.endDate <= ?)) OR "
@@ -705,11 +885,34 @@ public class ReservationScreenController implements Initializable {
         }
     }
     
-    private void countTotal() {
-        double sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString());
+    private void countTotal(List<Room> list) {
+        double sumPrices = 0;
+        for (Room room : list) {
+            //sum1 = Double.parseDouble(duration.getText().toString()) * Double.parseDouble(price.getText().toString());
+            sumPrices += Double.parseDouble(room.getRoomPrice().getValue());  
+        }
+        double sum1 = Double.parseDouble(duration.getText().toString()) * sumPrices;
         double sum2 = sum1 - ((Double.parseDouble(discount.getText().toString()) / 100) * sum1);
-        int sum = (int) sum2;
+        int sum = (int)sum2;
         total.setText(String.valueOf(sum));
+    }
+
+    @FXML
+    private void doCount() {
+        /*for(int i = 0; i < selectedRooms.size(); i++) {
+            System.out.println(selectedRooms.get(i).getRoomPrice());
+        }*/
+        if (roomCapacityCounter < Integer.parseInt(num_people.getValue().toString())) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Rooms capacity error");
+            alert.setHeaderText("Your selected rooms won't accomodate all the people.");
+            alert.setContentText("Please choose correct number of rooms and try again.");
+            alert.showAndWait();
+        }
+        else {
+            countTotal(selectedRooms);
+            isCounted = true;
+        }
     }
     
     class BillPrint implements Printable { // klasa wewnętrzna
@@ -778,7 +981,7 @@ public class ReservationScreenController implements Initializable {
                     y += yShift;
                     g2d.drawString("  Duration             " + dur + " days ", 12, y);
                     y += yShift;
-                    g2d.drawString("  Room number          " + roomnr + "  ", 12, y);
+                    g2d.drawString("  Room numbers         " + roomnr + "  ", 12, y);
                     y += yShift;
                     g2d.drawString("  Discount             " + disc + "%  ", 12, y);
                     y += yShift;

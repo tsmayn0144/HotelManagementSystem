@@ -5,7 +5,9 @@
  */
 package hotelmanagementsystem;
 
+import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import java.util.Objects;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -75,6 +77,54 @@ public class Room extends RecursiveTreeObject<Room> {
 
     public StringProperty getRoomStatus() {
         return roomStatus;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Room other = (Room) obj;
+        if (!Objects.equals(this.id, other.id)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomType, other.roomType)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomNumber, other.roomNumber)) {
+            return false;
+        }
+        if (!Objects.equals(this.numberOfPeople, other.numberOfPeople)) {
+            return false;
+        }
+        if (!Objects.equals(this.ac, other.ac)) {
+            return false;
+        }
+        if (!Objects.equals(this.balcony, other.balcony)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomPhone, other.roomPhone)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomPrice, other.roomPrice)) {
+            return false;
+        }
+        if (!Objects.equals(this.roomStatus, other.roomStatus)) {
+            return false;
+        }
+        return true;
     }
     
     
